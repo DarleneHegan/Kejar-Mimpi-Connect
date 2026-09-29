@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Absensi Hari-H - Kejar Mimpi Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <div class="flex h-screen overflow-hidden">
+    <aside id="admin-sidebar-slot" class="hidden md:block w-64 bg-white border-r border-gray-100 flex-shrink-0"></aside>
+
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <header class="md:hidden bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
+        <span class="font-bold text-gray-800">Kejar Mimpi <span class="text-[#C8102E]">Admin</span></span>
+        <button id="admin-mobile-menu-btn" class="p-2 text-gray-600">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+        </button>
+      </header>
+
+      <main class="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-6">
+          <h1 class="text-xl font-bold text-gray-800">Absensi Hari-H</h1>
+          <p class="text-sm text-gray-500 mt-1">Scan QR code peserta atau cari nama secara manual</p>
+        </div>
+
+        <div class="mb-6 max-w-md">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Event</label>
+          <select id="event-select" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C8102E]/40 focus:border-[#C8102E]">
+            <option value="">-- Memuat daftar event --</option>
+          </select>
+        </div>
+
+        <div id="checkin-panels" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Panel Scan QR -->
+          <div class="bg-white rounded-2xl border border-gray-100 p-6">
+            <h2 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <svg class="w-5 h-5 text-[#C8102E]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h4v4H4V4zm8 0h4v4h-4V4zM4 12h4v4H4v-4zm8.5 0h.01M16 12h4v4h-4v-4zM12 16h.01M16 16h.01M20 12h.01M12 20h.01M16 20h4v-4" /></svg>
+              Scan QR Code
+            </h2>
+            <div id="qr-reader" class="rounded-xl overflow-hidden bg-gray-100"></div>
+            <button id="toggle-scan-btn" class="w-full mt-4 bg-[#C8102E] hover:bg-[#a10d25] text-white font-semibold py-2.5 rounded-lg text-sm">
+              Mulai Scan
+            </button>
+            <div class="mt-4">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Atau input kode tiket manual</label>
+              <div class="flex gap-2">
+                <input type="text" id="manual-token-input" placeholder="Kode tiket..."
+                  class="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C8102E]/40 focus:border-[#C8102E]" />
+                <button id="manual-token-submit" class="px-4 py-2.5 rounded-lg bg-gray-800 hover:bg-gray-900 text-white text-sm font-semibold">Cek</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel Cari Nama -->
+          <div class="bg-white rounded-2xl border border-gray-100 p-6">
+            <h2 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <svg class="w-5 h-5 text-[#C8102E]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              Cari Nama Peserta
+            </h2>
+            <input type="text" id="search-name-input" placeholder="Cari berdasarkan nama atau email..."
+              class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C8102E]/40 focus:border-[#C8102E] mb-4" />
+            <div id="search-results" class="space-y-2 max-h-96 overflow-y-auto thin-scrollbar"></div>
+          </div>
+        </div>
+
+        <div id="no-event-state" class="flex flex-col items-center justify-center py-16 text-center">
+          <p class="text-gray-500 font-medium">Pilih event terlebih dahulu untuk mulai absensi</p>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal hasil check-in -->
+  <div id="result-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4">
+    <div class="bg-white rounded-2xl w-full max-w-sm p-6 text-center">
+      <div id="result-icon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"></div>
+      <h2 id="result-title" class="font-bold text-gray-800 text-lg mb-1"></h2>
+      <p id="result-message" class="text-sm text-gray-500 mb-6"></p>
+      <button id="result-close-btn" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2.5 rounded-lg">Tutup</button>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/components.js"></script>
+  <script src="/js/pages/admin-checkin.js"></script>
+</body>
+</html>

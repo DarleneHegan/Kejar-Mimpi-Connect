@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kelola Event - Kejar Mimpi Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside id="admin-sidebar-slot" class="hidden md:block w-64 bg-white border-r border-gray-100 flex-shrink-0"></aside>
+
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <!-- Topbar mobile -->
+      <header class="md:hidden bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
+        <span class="font-bold text-gray-800">Kejar Mimpi <span class="text-[#C8102E]">Admin</span></span>
+        <button id="admin-mobile-menu-btn" class="p-2 text-gray-600">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+        </button>
+      </header>
+
+      <main class="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+          <div>
+            <h1 class="text-xl font-bold text-gray-800">Kelola Event</h1>
+            <p class="text-sm text-gray-500 mt-1">Buat, ubah, dan publikasikan event komunitas</p>
+          </div>
+          <button id="open-create-modal-btn" class="bg-[#C8102E] hover:bg-[#a10d25] text-white font-semibold px-5 py-2.5 rounded-lg text-sm flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+            Buat Event Baru
+          </button>
+        </div>
+
+        <div id="loading-state" class="flex justify-center py-16">
+          <div class="spinner"></div>
+        </div>
+
+        <div id="empty-state" class="hidden flex-col items-center justify-center py-16 text-center">
+          <p class="text-gray-500 font-medium">Belum ada event</p>
+          <p class="text-gray-400 text-sm mt-1">Klik "Buat Event Baru" untuk mulai</p>
+        </div>
+
+        <div id="event-table-wrap" class="hidden bg-white rounded-2xl border border-gray-100 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+                <tr>
+                  <th class="text-left px-5 py-3 font-semibold">Event</th>
+                  <th class="text-left px-5 py-3 font-semibold">Tanggal</th>
+                  <th class="text-left px-5 py-3 font-semibold">Status</th>
+                  <th class="text-left px-5 py-3 font-semibold">Peserta</th>
+                  <th class="text-right px-5 py-3 font-semibold">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="event-table-body" class="divide-y divide-gray-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal Create/Edit Event -->
+  <div id="event-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4">
+    <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 sticky top-0 bg-white">
+        <h2 id="modal-title" class="font-bold text-gray-800">Buat Event Baru</h2>
+        <button id="close-modal-btn" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      <form id="event-form" class="p-6 space-y-4">
+        <input type="hidden" id="event-id" />
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Judul Event *</label>
+          <input type="text" id="title" required minlength="3" maxlength="200"
+            class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C8102E]/40 focus:border-[#C8102E]" />
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+            <input type="text" id="category" placeholder="misal: Workshop"
+              class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C8102E]/40 focus:border-[#C8102E]" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Kuota (kosongkan jika tanpa batas)</label>
+            <input type="number" id="quota" min="1"
+              class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C8102E]/40 focus:border-[#C8102E]" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Waktu Mulai *</label>
+            <input type="datetime-local" id="start_time" required
+              class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C8102E]/40 focus:border-[#C8102E]" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Waktu Selesai</label>
+            <input type="datetime-local" id="end_time"
+              class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C8102E]/40 focus:border-[#C8102E]" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Lokasi</label>
+          <input type="text" id="location" placeholder="misal: Aula Gedung A / Zoom Meeting"
+            class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C8102E]/40 focus:border-[#C8102E]" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">URL Gambar Event</label>
+          <input type="url" id="image_url" placeholder="https://..."
+            class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C8102E]/40 focus:border-[#C8102E]" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
+          <textarea id="description" rows="4"
+            class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C8102E]/40 focus:border-[#C8102E]"></textarea>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="is_published" checked class="w-4 h-4 text-[#C8102E] rounded focus:ring-[#C8102E]" />
+          <label for="is_published" class="text-sm text-gray-700">Publikasikan event ini (terlihat oleh publik)</label>
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <button type="button" id="cancel-modal-btn" class="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 text-gray-600 font-medium hover:bg-gray-50">Batal</button>
+          <button type="submit" id="save-btn" class="flex-1 bg-[#C8102E] hover:bg-[#a10d25] text-white font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2">
+            <span id="save-btn-text">Simpan Event</span>
+            <div id="save-spinner" class="hidden spinner !w-4 !h-4 !border-2 !border-white !border-t-transparent"></div>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Konfirmasi Hapus -->
+  <div id="delete-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4">
+    <div class="bg-white rounded-2xl w-full max-w-sm p-6">
+      <h2 class="font-bold text-gray-800 mb-2">Hapus Event?</h2>
+      <p class="text-sm text-gray-500 mb-6">Event beserta seluruh data pendaftar akan dihapus permanen. Tindakan ini tidak bisa dibatalkan.</p>
+      <div class="flex gap-3">
+        <button id="cancel-delete-btn" class="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 text-gray-600 font-medium hover:bg-gray-50">Batal</button>
+        <button id="confirm-delete-btn" class="flex-1 bg-[#C8102E] hover:bg-[#a10d25] text-white font-semibold py-2.5 rounded-lg">Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/components.js"></script>
+  <script src="/js/pages/admin-dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laporan Peserta - Kejar Mimpi Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <div class="flex h-screen overflow-hidden">
+    <aside id="admin-sidebar-slot" class="hidden md:block w-64 bg-white border-r border-gray-100 flex-shrink-0"></aside>
+
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <header class="md:hidden bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
+        <span class="font-bold text-gray-800">Kejar Mimpi <span class="text-[#C8102E]">Admin</span></span>
+        <button id="admin-mobile-menu-btn" class="p-2 text-gray-600">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+        </button>
+      </header>
+
+      <main class="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-6">
+          <h1 class="text-xl font-bold text-gray-800">Laporan Peserta</h1>
+          <p class="text-sm text-gray-500 mt-1">Lihat daftar pendaftar dan status kehadiran per event</p>
+        </div>
+
+        <div class="mb-6 flex flex-col sm:flex-row gap-4">
+          <div class="max-w-md flex-1">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Event</label>
+            <select id="event-select" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C8102E]/40 focus:border-[#C8102E]">
+              <option value="">-- Memuat daftar event --</option>
+            </select>
+          </div>
+          <div class="max-w-md flex-1">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Cari Peserta</label>
+            <input type="text" id="search-input" placeholder="Cari nama atau email..."
+              class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C8102E]/40 focus:border-[#C8102E]" />
+          </div>
+        </div>
+
+        <div id="stats-cards" class="hidden grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6"></div>
+
+        <div id="no-event-state" class="flex flex-col items-center justify-center py-16 text-center">
+          <p class="text-gray-500 font-medium">Pilih event untuk melihat laporan peserta</p>
+        </div>
+
+        <div id="report-table-wrap" class="hidden bg-white rounded-2xl border border-gray-100 overflow-hidden">
+          <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+            <span id="result-count" class="text-sm text-gray-500"></span>
+            <button id="export-csv-btn" class="text-sm font-semibold px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:border-[#C8102E] hover:text-[#C8102E] flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+              Export CSV
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+                <tr>
+                  <th class="text-left px-5 py-3 font-semibold">Nama</th>
+                  <th class="text-left px-5 py-3 font-semibold">Email</th>
+                  <th class="text-left px-5 py-3 font-semibold">No. HP</th>
+                  <th class="text-left px-5 py-3 font-semibold">Waktu Daftar</th>
+                  <th class="text-left px-5 py-3 font-semibold">Status</th>
+                  <th class="text-left px-5 py-3 font-semibold">Waktu Check-in</th>
+                </tr>
+              </thead>
+              <tbody id="report-table-body" class="divide-y divide-gray-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/components.js"></script>
+  <script src="/js/pages/admin-reports.js"></script>
+</body>
+</html>

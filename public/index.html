@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kejar Mimpi by CIMB Niaga</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <div id="navbar-slot"></div>
+
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-br from-[#C8102E] to-[#8a0b20] text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+      <div class="max-w-2xl">
+        <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight mb-4">
+          Temukan Event Kejar Mimpi by CIMB Niaga
+        </h1>
+        <p class="text-red-100 text-base md:text-lg mb-8">
+          Jelajahi berbagai kegiatan komunitas, daftar dalam sekejap, dan cukup tunjukkan QR code kamu saat hari-H. Tanpa ribet, tanpa antre panjang.
+        </p>
+        <div class="relative max-w-lg">
+          <input
+            id="search-input"
+            type="text"
+            placeholder="Cari event, misal: Workshop, Seminar..."
+            class="w-full pl-12 pr-4 py-3.5 rounded-xl text-gray-800 focus:outline-none focus:ring-4 focus:ring-white/30 shadow-lg"
+          />
+          <svg class="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filter kategori -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+    <div id="category-filters" class="flex flex-wrap gap-2"></div>
+  </section>
+
+  <!-- Event List -->
+  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-xl font-bold text-gray-800">Event Mendatang</h2>
+      <span id="event-count" class="text-sm text-gray-500"></span>
+    </div>
+
+    <div id="loading-state" class="flex justify-center py-20">
+      <div class="spinner"></div>
+    </div>
+
+    <div id="empty-state" class="hidden flex-col items-center justify-center py-20 text-center">
+      <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+      <p class="text-gray-500 font-medium">Tidak ada event yang ditemukan</p>
+      <p class="text-gray-400 text-sm mt-1">Coba kata kunci lain atau reset filter</p>
+    </div>
+
+    <div id="event-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </main>
+
+  <div id="footer-slot"></div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/components.js"></script>
+  <script src="/js/pages/home.js"></script>
+</body>
+</html>
