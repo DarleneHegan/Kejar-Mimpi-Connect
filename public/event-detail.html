@@ -58,6 +58,12 @@
             <p id="register-closed-text" class="text-gray-500 font-medium"></p>
           </div>
 
+          <div id="register-pending-notice" class="hidden text-center py-6">
+            <svg class="w-12 h-12 text-amber-400 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l2 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <p class="text-gray-700 font-semibold mb-1">Pendaftaran berhasil dikirim!</p>
+            <p class="text-gray-500 text-sm">Pendaftaranmu sedang menunggu approval dari admin. Tiket (QR code) akan terbit setelah disetujui. Kamu akan bisa cek statusnya dengan menyimpan link ini.</p>
+          </div>
+
           <form id="register-form" class="space-y-4">
             <h3 class="font-bold text-gray-800 mb-2">Daftar Sekarang</h3>
             <div>
@@ -75,12 +81,15 @@
               <input type="tel" id="phone" maxlength="30"
                 class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C8102E]/40 focus:border-[#C8102E]" />
             </div>
+
+            <div id="custom-fields-wrap" class="space-y-4"></div>
+
             <button type="submit" id="submit-btn"
               class="w-full bg-[#C8102E] hover:bg-[#a10d25] text-white font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
               <span id="submit-btn-text">Daftar Event</span>
               <div id="submit-spinner" class="hidden spinner !w-4 !h-4 !border-2 !border-white !border-t-transparent"></div>
             </button>
-            <p class="text-xs text-gray-400 text-center">Kamu akan mendapatkan QR code sebagai tiket masuk di hari-H.</p>
+            <p id="register-footer-note" class="text-xs text-gray-400 text-center">Kamu akan mendapatkan QR code sebagai tiket masuk di hari-H.</p>
           </form>
         </div>
       </div>

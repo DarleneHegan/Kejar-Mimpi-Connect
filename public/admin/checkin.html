@@ -24,65 +24,121 @@
       </header>
 
       <main class="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="mb-6">
-          <h1 class="text-xl font-bold text-gray-800">Absensi Hari-H</h1>
-          <p class="text-sm text-gray-500 mt-1">Scan QR code peserta atau cari nama secara manual</p>
+        <div class="admin-hero">
+          <div class="admin-hero-glow"></div>
+          <div class="relative">
+            <p class="admin-hero-eyebrow">Hari-H</p>
+            <h1 class="text-2xl font-extrabold">Absensi Hari-H</h1>
+            <p class="text-sm text-white/80 mt-1 max-w-xl">Scan QR code peserta atau cari nama secara manual untuk mencatat kehadiran.</p>
+          </div>
+          <div class="relative mt-5 max-w-md">
+            <label for="event-select" class="sr-only">Pilih Event</label>
+            <select id="event-select" class="admin-hero-select">
+              <option value="">-- Memuat daftar event --</option>
+            </select>
+          </div>
         </div>
 
-        <div class="mb-6 max-w-md">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Event</label>
-          <select id="event-select" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C8102E]/40 focus:border-[#C8102E]">
-            <option value="">-- Memuat daftar event --</option>
-          </select>
+        <!-- Stat cards -->
+        <div id="stats-cards" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <div class="admin-card p-5">
+            <div class="flex items-center gap-3">
+              <div class="admin-icon-badge bg-gray-100 text-gray-600">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+              </div>
+              <div>
+                <p class="text-xs text-gray-400">Peserta Terkonfirmasi</p>
+                <p id="stat-total" class="text-2xl font-extrabold text-gray-800">0</p>
+              </div>
+            </div>
+          </div>
+          <div class="admin-card p-5">
+            <div class="flex items-center gap-3">
+              <div class="admin-icon-badge bg-green-100 text-green-600">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+              </div>
+              <div>
+                <p class="text-xs text-gray-400">Sudah Hadir</p>
+                <p id="stat-present" class="text-2xl font-extrabold text-gray-800">0</p>
+              </div>
+            </div>
+          </div>
+          <div class="admin-card p-5">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-xs text-gray-400">Tingkat Kehadiran</p>
+              <p id="stat-rate-text" class="text-xs font-semibold text-gray-600">0%</p>
+            </div>
+            <div class="h-2.5 w-full bg-gray-100 rounded-full overflow-hidden">
+              <div id="stat-rate-bar" class="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full transition-all duration-500" style="width:0%"></div>
+            </div>
+            <p id="stat-rate-hint" class="text-xs text-gray-500 mt-2"></p>
+          </div>
         </div>
 
-        <div id="checkin-panels" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div id="checkin-panels" class="hidden grid grid-cols-1 lg:grid-cols-5 gap-6">
           <!-- Panel Scan QR -->
-          <div class="bg-white rounded-2xl border border-gray-100 p-6">
-            <h2 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <svg class="w-5 h-5 text-[#C8102E]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h4v4H4V4zm8 0h4v4h-4V4zM4 12h4v4H4v-4zm8.5 0h.01M16 12h4v4h-4v-4zM12 16h.01M16 16h.01M20 12h.01M12 20h.01M16 20h4v-4" /></svg>
+          <div class="admin-card p-6 lg:col-span-2 self-start">
+            <h2 class="font-bold text-gray-800 mb-4 flex items-center gap-3">
+              <span class="admin-icon-badge bg-red-50 text-[#C8102E]">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h4v4H4V4zm8 0h4v4h-4V4zM4 12h4v4H4v-4zm8.5 0h.01M16 12h4v4h-4v-4zM12 16h.01M16 16h.01M20 12h.01M12 20h.01M16 20h4v-4" /></svg>
+              </span>
               Scan QR Code
             </h2>
             <div id="qr-reader" class="rounded-xl overflow-hidden bg-gray-100"></div>
-            <button id="toggle-scan-btn" class="w-full mt-4 bg-[#C8102E] hover:bg-[#a10d25] text-white font-semibold py-2.5 rounded-lg text-sm">
-              Mulai Scan
-            </button>
+            <button id="toggle-scan-btn" class="admin-btn-primary w-full mt-4">Mulai Scan</button>
             <div class="mt-4">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Atau input kode tiket manual</label>
+              <label for="manual-token-input" class="admin-label">Atau input kode tiket manual</label>
               <div class="flex gap-2">
-                <input type="text" id="manual-token-input" placeholder="Kode tiket..."
-                  class="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C8102E]/40 focus:border-[#C8102E]" />
-                <button id="manual-token-submit" class="px-4 py-2.5 rounded-lg bg-gray-800 hover:bg-gray-900 text-white text-sm font-semibold">Cek</button>
+                <input type="text" id="manual-token-input" placeholder="Kode tiket..." class="admin-input flex-1" />
+                <button id="manual-token-submit" class="px-4 py-2.5 rounded-xl bg-gray-900 hover:bg-black text-white text-sm font-semibold">Cek</button>
               </div>
             </div>
           </div>
 
-          <!-- Panel Cari Nama -->
-          <div class="bg-white rounded-2xl border border-gray-100 p-6">
-            <h2 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <svg class="w-5 h-5 text-[#C8102E]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-              Cari Nama Peserta
-            </h2>
-            <input type="text" id="search-name-input" placeholder="Cari berdasarkan nama atau email..."
-              class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C8102E]/40 focus:border-[#C8102E] mb-4" />
-            <div id="search-results" class="space-y-2 max-h-96 overflow-y-auto thin-scrollbar"></div>
+          <!-- Panel daftar peserta (tab Belum Hadir / Sudah Hadir) -->
+          <div class="admin-card overflow-hidden lg:col-span-3">
+            <div class="px-5 pt-4 border-b border-gray-100">
+              <div role="tablist" aria-label="Status kehadiran" class="flex gap-1 overflow-x-auto">
+                <button role="tab" data-tab="absent" class="status-tab flex items-center gap-2 px-4 py-3 text-sm font-semibold whitespace-nowrap">
+                  <span class="w-2 h-2 rounded-full bg-amber-400"></span> Belum Hadir
+                  <span data-tab-count="absent" class="text-xs px-2 py-0.5 rounded-full">0</span>
+                </button>
+                <button role="tab" data-tab="present" class="status-tab flex items-center gap-2 px-4 py-3 text-sm font-semibold whitespace-nowrap">
+                  <span class="w-2 h-2 rounded-full bg-green-500"></span> Sudah Hadir
+                  <span data-tab-count="present" class="text-xs px-2 py-0.5 rounded-full">0</span>
+                </button>
+              </div>
+            </div>
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-4 border-b border-gray-100">
+              <span id="result-count" class="text-xs font-medium text-gray-400"></span>
+              <div class="relative sm:ml-auto sm:w-72">
+                <svg class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" /></svg>
+                <label for="search-name-input" class="sr-only">Cari peserta</label>
+                <input type="text" id="search-name-input" placeholder="Cari nama atau email..." class="admin-search" />
+              </div>
+            </div>
+            <div id="search-results" class="divide-y divide-gray-50 max-h-[32rem] overflow-y-auto thin-scrollbar"></div>
           </div>
         </div>
 
-        <div id="no-event-state" class="flex flex-col items-center justify-center py-16 text-center">
-          <p class="text-gray-500 font-medium">Pilih event terlebih dahulu untuk mulai absensi</p>
+        <div id="no-event-state" class="flex flex-col items-center justify-center admin-empty">
+          <div class="admin-icon-badge w-14 h-14 bg-red-50 text-[#C8102E] mb-3">
+            <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h4v4H4V4zm8 0h4v4h-4V4zM4 12h4v4H4v-4zm8.5 0h.01M16 12h4v4h-4v-4zM12 16h.01M16 16h.01M20 12h.01M12 20h.01M16 20h4v-4" /></svg>
+          </div>
+          <p class="text-gray-600 font-semibold">Pilih event terlebih dahulu</p>
+          <p class="text-gray-400 text-sm mt-1">Panel scan QR dan pencarian peserta akan muncul di sini</p>
         </div>
       </main>
     </div>
   </div>
 
   <!-- Modal hasil check-in -->
-  <div id="result-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4">
-    <div class="bg-white rounded-2xl w-full max-w-sm p-6 text-center">
+  <div id="result-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4 admin-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="result-title">
+    <div class="admin-modal max-w-sm p-6 text-center">
       <div id="result-icon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"></div>
       <h2 id="result-title" class="font-bold text-gray-800 text-lg mb-1"></h2>
       <p id="result-message" class="text-sm text-gray-500 mb-6"></p>
-      <button id="result-close-btn" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2.5 rounded-lg">Tutup</button>
+      <button id="result-close-btn" class="w-full bg-gray-900 hover:bg-black text-white font-semibold py-2.5 rounded-xl">Tutup</button>
     </div>
   </div>
 

@@ -29,6 +29,19 @@ def check_in(
     if not registration:
         return CheckInResponse(success=False, message="Tiket tidak ditemukan / tidak valid")
 
+    if registration.status == "pending":
+        return CheckInResponse(
+            success=False,
+            message=f"Pendaftaran '{registration.full_name}' masih menunggu approval admin, belum bisa check-in",
+            registration=RegistrationOut.model_validate(registration),
+        )
+    if registration.status == "rejected":
+        return CheckInResponse(
+            success=False,
+            message=f"Pendaftaran '{registration.full_name}' telah ditolak, tidak bisa check-in",
+            registration=RegistrationOut.model_validate(registration),
+        )
+
     if registration.is_checked_in:
         return CheckInResponse(
             success=False,
@@ -59,6 +72,19 @@ def check_in_manual_by_id(
     registration = db.query(Registration).filter(Registration.id == registration_id).first()
     if not registration:
         raise HTTPException(status_code=404, detail="Registrasi tidak ditemukan")
+
+    if registration.status == "pending":
+        return CheckInResponse(
+            success=False,
+            message=f"Pendaftaran '{registration.full_name}' masih menunggu approval admin, belum bisa check-in",
+            registration=RegistrationOut.model_validate(registration),
+        )
+    if registration.status == "rejected":
+        return CheckInResponse(
+            success=False,
+            message=f"Pendaftaran '{registration.full_name}' telah ditolak, tidak bisa check-in",
+            registration=RegistrationOut.model_validate(registration),
+        )
 
     if registration.is_checked_in:
         return CheckInResponse(

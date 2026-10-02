@@ -28,7 +28,9 @@ function renderEventCard(event) {
         : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#C8102E] to-[#8a0b20] text-white text-2xl font-bold">${event.title.charAt(0)}</div>`
       }
       ${event.category ? `<span class="absolute top-3 left-3 text-xs font-semibold px-2.5 py-1 rounded-full ${categoryBadgeClass(event.category)}">${event.category}</span>` : ""}
-      ${isFull ? `<span class="absolute top-3 right-3 text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-800 text-white">Kuota Penuh</span>` : ""}
+      ${event.is_closed
+        ? `<span class="absolute top-3 right-3 text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-800 text-white">Pendaftaran Ditutup</span>`
+        : isFull ? `<span class="absolute top-3 right-3 text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-800 text-white">Kuota Penuh</span>` : ""}
     </div>
     <div class="p-5 flex flex-col flex-1">
       <h3 class="font-bold text-gray-800 mb-2 line-clamp-2 group-hover:text-[#C8102E] transition-colors">${event.title}</h3>
@@ -43,8 +45,8 @@ function renderEventCard(event) {
       </div>` : '<div class="mb-3"></div>'}
       <p class="text-sm text-gray-500 line-clamp-2 mb-4 flex-1">${event.description || ""}</p>
       <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-        <span class="text-xs font-medium ${isFull ? 'text-gray-400' : 'text-green-600'}">
-          ${event.quota ? (isFull ? 'Kuota penuh' : `${spotsLeft} slot tersisa`) : 'Slot tidak terbatas'}
+        <span class="text-xs font-medium ${isFull || event.is_closed ? 'text-gray-400' : 'text-green-600'}">
+          ${event.is_closed ? 'Pendaftaran ditutup' : event.quota ? (isFull ? 'Kuota penuh' : `${spotsLeft} slot tersisa`) : 'Slot tidak terbatas'}
         </span>
         <span class="text-sm font-semibold text-[#C8102E] group-hover:underline">Lihat Detail &rarr;</span>
       </div>

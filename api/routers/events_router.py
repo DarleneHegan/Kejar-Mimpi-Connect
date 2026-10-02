@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 
 from api.database import get_db
-from api.models import Event, Registration, Admin
+from api.models import Event, Registration, Admin, EventFormField
 from api.schemas import EventCreate, EventUpdate, EventOut
 from api.auth import get_current_admin
 
@@ -19,9 +19,16 @@ router = APIRouter(prefix="/api/events", tags=["events"])
 
 
 def _to_event_out(event: Event, db: Session) -> EventOut:
+    # registered_count = peserta yang sudah pasti ikut (confirmed), tidak termasuk pending/rejected.
     registered_count = (
         db.query(func.count(Registration.id))
-        .filter(Registration.event_id == event.id)
+        .filter(Registration.event_id == event.id, Registration.status == "confirmed")
+        .scalar()
+        or 0
+    )
+    pending_count = (
+        db.query(func.count(Registration.id))
+        .filter(Registration.event_id == event.id, Registration.status == "pending")
         .scalar()
         or 0
     )
@@ -34,6 +41,7 @@ def _to_event_out(event: Event, db: Session) -> EventOut:
     data = EventOut.model_validate(event)
     data.registered_count = registered_count
     data.checked_in_count = checked_in_count
+    data.pending_count = pending_count
     return data
 
 
@@ -81,7 +89,11 @@ def create_event(
     db: Session = Depends(get_db),
     admin: Admin = Depends(get_current_admin),
 ):
-    event = Event(**payload.model_dump())
+    # Event baru selalu masuk sebagai draft; publikasi dilakukan terpisah dari daftar event.
+    data = payload.model_dump()
+    data["is_published"] = False
+    data["is_closed"] = False
+    event = Event(**data)
     db.add(event)
     db.commit()
     db.refresh(event)
@@ -100,6 +112,18 @@ def update_event(
         raise HTTPException(status_code=404, detail="Event tidak ditemukan")
 
     update_data = payload.model_dump(exclude_unset=True)
+    if update_data.get("is_published") and not event.is_published:
+        field_count = (
+            db.query(func.count(EventFormField.id))
+            .filter(EventFormField.event_id == event.id)
+            .scalar()
+            or 0
+        )
+        if field_count == 0:
+            raise HTTPException(
+                status_code=400,
+                detail="Event belum bisa dipublikasikan: form pendaftaran minimal harus punya 1 pertanyaan",
+            )
     for key, value in update_data.items():
         setattr(event, key, value)
     event.updated_at = datetime.utcnow()

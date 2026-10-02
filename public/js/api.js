@@ -103,6 +103,15 @@ async function deleteEvent(eventId) {
   return apiFetch(`/api/events/${eventId}`, { method: "DELETE" }, true);
 }
 
+// ---------- Form Fields (Form Builder) ----------
+async function fetchEventFormFields(eventId) {
+  return apiFetch(`/api/events/${eventId}/form-fields`);
+}
+
+async function saveEventFormFields(eventId, fields) {
+  return apiFetch(`/api/events/${eventId}/form-fields`, { method: "PUT", body: { fields } }, true);
+}
+
 // ---------- Registrations ----------
 async function registerForEvent(eventId, payload) {
   return apiFetch(`/api/events/${eventId}/register`, { method: "POST", body: payload });
@@ -112,9 +121,28 @@ async function fetchRegistrationByToken(ticketToken) {
   return apiFetch(`/api/registrations/${ticketToken}`);
 }
 
-async function fetchRegistrationsForEvent(eventId, search) {
-  const query = search ? `?search=${encodeURIComponent(search)}` : "";
+async function fetchRegistrationsForEvent(eventId, search, status) {
+  const params = new URLSearchParams();
+  if (search) params.set("search", search);
+  if (status) params.set("status", status);
+  const query = params.toString() ? `?${params.toString()}` : "";
   return apiFetch(`/api/events/${eventId}/registrations${query}`, {}, true);
+}
+
+async function approveRegistration(registrationId) {
+  return apiFetch(`/api/registrations/${registrationId}/approve`, { method: "PATCH" }, true);
+}
+
+async function rejectRegistration(registrationId, remarks) {
+  return apiFetch(`/api/registrations/${registrationId}/reject`, { method: "PATCH", body: { remarks } }, true);
+}
+
+async function bulkDecideRegistrations(registrationIds, action, remarks = null) {
+  return apiFetch(
+    "/api/registrations/bulk-decision",
+    { method: "POST", body: { registration_ids: registrationIds, action, remarks } },
+    true
+  );
 }
 
 // ---------- Check-in ----------

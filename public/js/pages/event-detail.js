@@ -1,10 +1,91 @@
-// Logic halaman detail event + form pendaftaran.
+// Logic halaman detail event + form pendaftaran (dengan custom field dinamis).
 
 let currentEvent = null;
+let currentFormFields = [];
 
 function getEventIdFromUrl() {
   const params = new URLSearchParams(window.location.search);
   return params.get("id");
+}
+
+function renderCustomFieldInput(field) {
+  const req = field.is_required ? "required" : "";
+  const label = `<label class="block text-sm font-medium text-gray-700 mb-1">${field.label}${field.is_required ? " *" : ""}</label>`;
+  const baseInputClass = "w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C8102E]/40 focus:border-[#C8102E]";
+
+  if (field.field_type === "textarea") {
+    return `<div>${label}<textarea data-custom-field="${field.id}" ${req} rows="3" class="${baseInputClass}"></textarea></div>`;
+  }
+  if (field.field_type === "dropdown") {
+    const options = (field.options || []).map((o) => `<option value="${o}">${o}</option>`).join("");
+    return `<div>${label}<select data-custom-field="${field.id}" ${req} class="${baseInputClass}"><option value="">-- Pilih --</option>${options}</select></div>`;
+  }
+  if (field.field_type === "radio") {
+    const options = (field.options || [])
+      .map(
+        (o, i) => `<label class="flex items-center gap-2 text-sm text-gray-700">
+        <input type="radio" name="custom-radio-${field.id}" data-custom-field="${field.id}" value="${o}" ${req} class="text-[#C8102E] focus:ring-[#C8102E]" /> ${o}
+      </label>`
+      )
+      .join("");
+    return `<div>${label}<div class="space-y-1.5">${options}</div></div>`;
+  }
+  if (field.field_type === "checkbox") {
+    const options = (field.options || [])
+      .map(
+        (o) => `<label class="flex items-center gap-2 text-sm text-gray-700">
+        <input type="checkbox" data-custom-field="${field.id}" value="${o}" class="text-[#C8102E] rounded focus:ring-[#C8102E]" /> ${o}
+      </label>`
+      )
+      .join("");
+    return `<div>${label}<div class="space-y-1.5">${options}</div></div>`;
+  }
+  const inputType = field.field_type === "number" ? "number" : field.field_type === "email" ? "email" : field.field_type === "phone" ? "tel" : "text";
+  return `<div>${label}<input type="${inputType}" data-custom-field="${field.id}" ${req} class="${baseInputClass}" /></div>`;
+}
+
+function renderCustomFields(fields) {
+  const wrap = document.getElementById("custom-fields-wrap");
+  wrap.innerHTML = fields.map(renderCustomFieldInput).join("");
+}
+
+function collectCustomAnswers() {
+  const answers = {};
+  for (const field of currentFormFields) {
+    if (field.field_type === "checkbox") {
+      const checked = Array.from(
+        document.querySelectorAll(`[data-custom-field="${field.id}"]:checked`)
+      ).map((el) => el.value);
+      if (checked.length > 0) answers[field.id] = checked;
+    } else if (field.field_type === "radio") {
+      const checked = document.querySelector(`[data-custom-field="${field.id}"]:checked`);
+      if (checked) answers[field.id] = checked.value;
+    } else {
+      const el = document.querySelector(`[data-custom-field="${field.id}"]`);
+      if (el && el.value) answers[field.id] = el.value;
+    }
+  }
+  return answers;
+}
+
+function validateCustomFields() {
+  for (const field of currentFormFields) {
+    if (!field.is_required) continue;
+    if (field.field_type === "checkbox") {
+      const checked = document.querySelectorAll(`[data-custom-field="${field.id}"]:checked`);
+      if (checked.length === 0) {
+        showToast(`"${field.label}" wajib diisi`, "error");
+        return false;
+      }
+    } else if (field.field_type === "radio") {
+      const checked = document.querySelector(`[data-custom-field="${field.id}"]:checked`);
+      if (!checked) {
+        showToast(`"${field.label}" wajib diisi`, "error");
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 function renderEventDetail(event) {
@@ -40,8 +121,12 @@ function renderEventDetail(event) {
   const isFull = event.quota && event.registered_count >= event.quota;
   const isPast = new Date(event.start_time) < new Date();
 
+  const isClosed = !!event.is_closed;
+
   if (isPast) {
     quotaInfo.innerHTML = `<span class="text-gray-500">Pendaftaran telah ditutup</span>`;
+  } else if (isClosed) {
+    quotaInfo.innerHTML = `<span class="text-gray-500">Pendaftaran ditutup oleh penyelenggara</span>`;
   } else if (isFull) {
     quotaInfo.innerHTML = `<span class="text-red-600">Kuota sudah penuh (${event.registered_count}/${event.quota})</span>`;
   } else if (event.quota) {
@@ -51,12 +136,14 @@ function renderEventDetail(event) {
     quotaInfo.innerHTML = `<span class="text-green-600">Slot pendaftaran masih terbuka</span>`;
   }
 
-  if (isPast || isFull) {
+  if (isPast || isClosed || isFull) {
     document.getElementById("register-form").classList.add("hidden");
     document.getElementById("register-closed").classList.remove("hidden");
     document.getElementById("register-closed-text").textContent = isPast
       ? "Event ini sudah berlalu"
-      : "Kuota pendaftaran sudah penuh";
+      : isClosed
+        ? "Pendaftaran event ini sudah ditutup"
+        : "Kuota pendaftaran sudah penuh";
   }
 
   document.getElementById("loading-state").classList.add("hidden");
@@ -73,6 +160,16 @@ async function loadEventDetail() {
   try {
     const event = await fetchEventDetail(eventId);
     renderEventDetail(event);
+    try {
+      currentFormFields = await fetchEventFormFields(eventId);
+      renderCustomFields(currentFormFields);
+    } catch (err) {
+      currentFormFields = [];
+    }
+    if (event.requires_approval) {
+      document.getElementById("register-footer-note").textContent =
+        "Pendaftaranmu akan diperiksa admin terlebih dahulu. Tiket (QR code) baru terbit setelah disetujui.";
+    }
   } catch (err) {
     showNotFound();
   }
@@ -85,6 +182,8 @@ function showNotFound() {
 
 async function handleRegisterSubmit(e) {
   e.preventDefault();
+  if (!validateCustomFields()) return;
+
   const submitBtn = document.getElementById("submit-btn");
   const submitBtnText = document.getElementById("submit-btn-text");
   const submitSpinner = document.getElementById("submit-spinner");
@@ -93,6 +192,7 @@ async function handleRegisterSubmit(e) {
     full_name: document.getElementById("full_name").value.trim(),
     email: document.getElementById("email").value.trim(),
     phone: document.getElementById("phone").value.trim() || null,
+    answers: collectCustomAnswers(),
   };
 
   submitBtn.disabled = true;
@@ -101,8 +201,13 @@ async function handleRegisterSubmit(e) {
 
   try {
     const result = await registerForEvent(currentEvent.id, payload);
-    // Simpan sementara untuk halaman konfirmasi (opsional, karena halaman konfirmasi juga fetch ulang by token)
-    window.location.href = `/confirmation.html?token=${result.ticket_token}`;
+    if (result.status === "pending") {
+      // Butuh approval admin dulu - tampilkan notice, jangan redirect ke halaman QR.
+      document.getElementById("register-form").classList.add("hidden");
+      document.getElementById("register-pending-notice").classList.remove("hidden");
+    } else {
+      window.location.href = `/confirmation.html?token=${result.ticket_token}`;
+    }
   } catch (err) {
     showToast(err.message || "Gagal mendaftar, coba lagi", "error");
     submitBtn.disabled = false;

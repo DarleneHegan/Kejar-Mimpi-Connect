@@ -28,26 +28,52 @@ async function loadEventOptions() {
 
 function renderStatsCards() {
   const total = currentRegistrations.length;
-  const checkedIn = currentRegistrations.filter((r) => r.is_checked_in).length;
-  const notCheckedIn = total - checkedIn;
-  const rate = total > 0 ? Math.round((checkedIn / total) * 100) : 0;
+  const confirmed = currentRegistrations.filter((r) => r.status === "confirmed");
+  const checkedIn = confirmed.filter((r) => r.is_checked_in).length;
+  const notCheckedIn = confirmed.length - checkedIn;
+  const rate = confirmed.length > 0 ? Math.round((checkedIn / confirmed.length) * 100) : 0;
 
+  const icons = {
+    users: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z",
+    check: "M5 13l4 4L19 7",
+    clock: "M12 8v4l2 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z",
+    chart: "M13 7h8m0 0v8m0-8l-8 8-4-4-6 6",
+  };
   const cards = [
-    { label: "Total Pendaftar", value: total, color: "text-gray-800" },
-    { label: "Sudah Hadir", value: checkedIn, color: "text-green-600" },
-    { label: "Belum Hadir", value: notCheckedIn, color: "text-amber-600" },
-    { label: "Tingkat Kehadiran", value: `${rate}%`, color: "text-[#C8102E]" },
+    { label: "Total Pendaftar", value: total, badge: "bg-gray-100 text-gray-600", icon: icons.users },
+    { label: "Sudah Hadir", value: checkedIn, badge: "bg-green-100 text-green-600", icon: icons.check },
+    { label: "Belum Hadir", value: notCheckedIn, badge: "bg-amber-100 text-amber-600", icon: icons.clock },
+    { label: "Tingkat Kehadiran", value: `${rate}%`, badge: "bg-red-50 text-[#C8102E]", icon: icons.chart },
   ];
 
   document.getElementById("stats-cards").innerHTML = cards
     .map(
       (c) => `
-    <div class="bg-white rounded-2xl border border-gray-100 p-5">
-      <p class="text-xs text-gray-400 mb-1">${c.label}</p>
-      <p class="text-2xl font-extrabold ${c.color}">${c.value}</p>
+    <div class="admin-card p-5">
+      <div class="flex items-center gap-3">
+        <div class="admin-icon-badge ${c.badge}">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${c.icon}" /></svg>
+        </div>
+        <div>
+          <p class="text-xs text-gray-400">${c.label}</p>
+          <p class="text-2xl font-extrabold text-gray-800">${c.value}</p>
+        </div>
+      </div>
     </div>`
     )
     .join("");
+}
+
+function registrationStatusBadge(reg) {
+  if (reg.status === "pending") {
+    return `<span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-100 text-amber-700">Menunggu Approval</span>`;
+  }
+  if (reg.status === "rejected") {
+    return `<span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-red-100 text-red-700">Ditolak</span>`;
+  }
+  return reg.is_checked_in
+    ? `<span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-green-100 text-green-700">Hadir</span>`
+    : `<span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-100 text-gray-500">Belum Hadir</span>`;
 }
 
 function renderReportRow(reg) {
@@ -57,13 +83,7 @@ function renderReportRow(reg) {
     <td class="px-5 py-3.5 text-gray-600">${reg.email}</td>
     <td class="px-5 py-3.5 text-gray-600">${reg.phone || "-"}</td>
     <td class="px-5 py-3.5 text-gray-500">${formatDateTime(reg.created_at)}</td>
-    <td class="px-5 py-3.5">
-      ${
-        reg.is_checked_in
-          ? `<span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-green-100 text-green-700">Hadir</span>`
-          : `<span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-100 text-gray-500">Belum Hadir</span>`
-      }
-    </td>
+    <td class="px-5 py-3.5">${registrationStatusBadge(reg)}</td>
     <td class="px-5 py-3.5 text-gray-500">${reg.checked_in_at ? formatDateTime(reg.checked_in_at) : "-"}</td>
   </tr>`;
 }

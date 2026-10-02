@@ -18,50 +18,74 @@
   </div>
 
   <main id="content" class="hidden flex-1 max-w-lg mx-auto px-4 sm:px-6 py-10 w-full">
-    <div class="text-center mb-6">
-      <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-        <svg class="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+    <!-- Tampilan jika tiket sudah confirmed (ada QR) -->
+    <div id="confirmed-view" class="hidden">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+        </div>
+        <h1 class="text-xl md:text-2xl font-extrabold text-gray-800 mb-1">Pendaftaran Berhasil!</h1>
+        <p class="text-gray-500 text-sm">Simpan QR code ini, tunjukkan saat check-in di hari-H.</p>
       </div>
-      <h1 class="text-xl md:text-2xl font-extrabold text-gray-800 mb-1">Pendaftaran Berhasil!</h1>
-      <p class="text-gray-500 text-sm">Simpan QR code ini, tunjukkan saat check-in di hari-H.</p>
+
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div class="text-center mb-5">
+          <p class="text-xs text-gray-400 uppercase font-semibold tracking-wide mb-1">Event</p>
+          <h2 id="conf-event-title" class="font-bold text-gray-800 text-lg"></h2>
+        </div>
+
+        <div class="flex justify-center mb-5">
+          <div class="bg-white p-4 rounded-xl border-2 border-[#C8102E]/20">
+            <img id="qr-image" src="" alt="QR Code Tiket" class="w-52 h-52" />
+          </div>
+        </div>
+
+        <div class="space-y-2 text-sm border-t border-gray-100 pt-4">
+          <div class="flex justify-between">
+            <span class="text-gray-500">Nama</span>
+            <span id="conf-name" class="font-medium text-gray-800"></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Email</span>
+            <span id="conf-email" class="font-medium text-gray-800"></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Kode Tiket</span>
+            <span id="conf-token" class="font-mono text-xs text-gray-600"></span>
+          </div>
+        </div>
+
+        <button id="download-btn" class="w-full mt-6 bg-[#C8102E] hover:bg-[#a10d25] text-white font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+          Download QR Code
+        </button>
+        <a href="/index.html" class="block text-center text-sm text-gray-500 hover:text-[#C8102E] mt-4">Kembali ke daftar event</a>
+      </div>
+
+      <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-5 text-sm text-amber-800">
+        <strong>Penting:</strong> Screenshot atau download QR code ini. Tunjukkan ke panitia saat registrasi ulang di lokasi acara untuk absensi.
+      </div>
     </div>
 
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-      <div class="text-center mb-5">
-        <p class="text-xs text-gray-400 uppercase font-semibold tracking-wide mb-1">Event</p>
-        <h2 id="conf-event-title" class="font-bold text-gray-800 text-lg"></h2>
+    <!-- Tampilan jika pendaftaran masih menunggu approval admin -->
+    <div id="pending-view" class="hidden text-center">
+      <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l2 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
       </div>
-
-      <div class="flex justify-center mb-5">
-        <div class="bg-white p-4 rounded-xl border-2 border-[#C8102E]/20">
-          <img id="qr-image" src="" alt="QR Code Tiket" class="w-52 h-52" />
-        </div>
-      </div>
-
-      <div class="space-y-2 text-sm border-t border-gray-100 pt-4">
-        <div class="flex justify-between">
-          <span class="text-gray-500">Nama</span>
-          <span id="conf-name" class="font-medium text-gray-800"></span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-500">Email</span>
-          <span id="conf-email" class="font-medium text-gray-800"></span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-500">Kode Tiket</span>
-          <span id="conf-token" class="font-mono text-xs text-gray-600"></span>
-        </div>
-      </div>
-
-      <button id="download-btn" class="w-full mt-6 bg-[#C8102E] hover:bg-[#a10d25] text-white font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-        Download QR Code
-      </button>
-      <a href="/index.html" class="block text-center text-sm text-gray-500 hover:text-[#C8102E] mt-4">Kembali ke daftar event</a>
+      <h1 class="text-xl md:text-2xl font-extrabold text-gray-800 mb-1">Menunggu Approval Admin</h1>
+      <p id="pending-event-title" class="text-gray-600 font-medium mb-1"></p>
+      <p class="text-gray-500 text-sm mb-5">Pendaftaranmu sudah diterima dan sedang menunggu persetujuan admin. Tiket (QR code) akan muncul di halaman ini setelah disetujui.</p>
+      <a href="/index.html" class="inline-block text-sm text-gray-500 hover:text-[#C8102E]">Kembali ke daftar event</a>
     </div>
 
-    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-5 text-sm text-amber-800">
-      <strong>Penting:</strong> Screenshot atau download QR code ini. Tunjukkan ke panitia saat registrasi ulang di lokasi acara untuk absensi.
+    <!-- Tampilan jika pendaftaran ditolak admin -->
+    <div id="rejected-view" class="hidden text-center">
+      <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-[#C8102E]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+      </div>
+      <h1 class="text-xl md:text-2xl font-extrabold text-gray-800 mb-1">Pendaftaran Ditolak</h1>
+      <p class="text-gray-500 text-sm mb-5">Mohon maaf, pendaftaranmu untuk event ini tidak disetujui oleh admin.</p>
+      <a href="/index.html" class="inline-block text-sm text-gray-500 hover:text-[#C8102E]">Kembali ke daftar event</a>
     </div>
   </main>
 
