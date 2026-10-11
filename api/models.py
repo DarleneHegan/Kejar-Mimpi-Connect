@@ -89,3 +89,19 @@ class Registration(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     event = relationship("Event", back_populates="registrations")
+
+
+class Organizer(Base):
+    """Anggota organizer komunitas, ditampilkan di halaman About publik."""
+
+    __tablename__ = "organizers"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    name = Column(String, nullable=False)
+    role = Column(String, nullable=False)  # misal: Lead Organizer
+    affiliation = Column(String, nullable=True)  # instansi/perusahaan
+    photo_url = Column(Text, nullable=True)  # data URL gambar hasil crop (base64)
+    bio = Column(Text, nullable=True)
+    links = Column(JSON, nullable=True)  # [{"label": "LinkedIn", "url": "https://..."}]
+    order = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.utcnow)

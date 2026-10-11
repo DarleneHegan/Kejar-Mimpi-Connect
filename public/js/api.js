@@ -153,3 +153,20 @@ async function checkInByToken(ticketToken) {
 async function checkInManualById(registrationId) {
   return apiFetch(`/api/checkin/${registrationId}/manual`, { method: "POST" }, true);
 }
+
+// ---------- Organizers ----------
+async function fetchOrganizers() {
+  return apiFetch("/api/organizers");
+}
+
+async function createOrganizer(payload) {
+  return apiFetch("/api/organizers", { method: "POST", body: payload }, true);
+}
+
+async function updateOrganizer(id, payload) {
+  return apiFetch(`/api/organizers/${id}`, { method: "PUT", body: payload }, true);
+}
+
+async function deleteOrganizer(id) {
+  return apiFetch(`/api/organizers/${id}`, { method: "DELETE" }, true);
+}

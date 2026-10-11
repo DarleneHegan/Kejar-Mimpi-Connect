@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kelola Organizer - Kejar Mimpi Jakarta Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <div class="flex h-screen overflow-hidden">
+    <aside id="admin-sidebar-slot" class="hidden md:block w-64 bg-white border-r border-gray-100 flex-shrink-0"></aside>
+
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <header class="md:hidden bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
+        <span class="font-bold text-gray-800">Kejar Mimpi Jakarta <span class="text-[#C8102E]">Admin</span></span>
+        <button id="admin-mobile-menu-btn" class="p-2 text-gray-600" aria-label="Menu">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+        </button>
+      </header>
+
+      <main class="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="admin-hero">
+          <div class="admin-hero-glow"></div>
+          <div class="relative flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div>
+              <p class="admin-hero-eyebrow">Halaman About</p>
+              <h1 class="text-2xl font-extrabold">Kelola Organizer</h1>
+              <p class="text-sm text-white/80 mt-1 max-w-xl">Atur anggota organizer yang tampil di halaman About untuk peserta.</p>
+            </div>
+            <button id="add-btn" class="admin-hero-btn flex items-center gap-2 self-start sm:self-auto">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
+              Tambah Anggota
+            </button>
+          </div>
+        </div>
+
+        <div id="loading-state" class="flex justify-center py-16"><div class="spinner"></div></div>
+        <div id="empty-state" class="hidden flex-col items-center justify-center admin-empty">
+          <p class="text-gray-600 font-semibold">Belum ada organizer</p>
+          <p class="text-gray-400 text-sm mt-1">Klik "Tambah Anggota" untuk mulai</p>
+        </div>
+        <div id="organizer-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal tambah/edit organizer -->
+  <div id="org-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4 admin-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="org-modal-title">
+    <div class="admin-modal max-w-xl max-h-[90vh] flex flex-col overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <h2 id="org-modal-title" class="font-bold text-gray-800 text-lg">Tambah Anggota</h2>
+        <button type="button" id="org-close" aria-label="Tutup" class="text-gray-400 hover:text-gray-600 p-1">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      <form id="org-form" class="flex-1 flex flex-col min-h-0">
+        <div class="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+          <div class="flex items-center gap-4">
+            <div id="org-photo-preview" class="w-20 h-20 rounded-full overflow-hidden bg-gray-100 flex-shrink-0"></div>
+            <div class="flex-1">
+              <p class="admin-label">Foto Profil</p>
+              <div class="flex flex-wrap gap-2">
+                <label for="org-photo-file" class="admin-btn-ghost cursor-pointer inline-flex items-center gap-1.5">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                  <span id="org-photo-btn-text">Upload Foto</span>
+                </label>
+                <input type="file" id="org-photo-file" accept="image/jpeg,image/png,image/webp" class="sr-only" />
+                <button type="button" id="org-photo-recrop" class="hidden admin-btn-ghost">Atur Crop</button>
+                <button type="button" id="org-photo-remove" class="hidden text-xs font-semibold px-3 py-2 rounded-xl text-[#C8102E] hover:bg-red-50">Hapus Foto</button>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">JPG, PNG, atau WEBP, maks 10 MB. Setelah dipilih kamu bisa atur area crop.</p>
+            </div>
+          </div>
+          <div>
+            <label for="org-name" class="admin-label">Nama Lengkap <span class="text-[#C8102E]">*</span></label>
+            <input type="text" id="org-name" required minlength="2" maxlength="150" class="admin-input" />
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="org-role" class="admin-label">Peran <span class="text-[#C8102E]">*</span></label>
+              <input type="text" id="org-role" required minlength="2" maxlength="100" placeholder="misal: Lead Organizer" class="admin-input" />
+            </div>
+            <div>
+              <label for="org-affiliation" class="admin-label">Instansi / Perusahaan</label>
+              <input type="text" id="org-affiliation" maxlength="150" class="admin-input" />
+            </div>
+          </div>
+          <div>
+            <label for="org-order" class="admin-label">Urutan Tampil</label>
+            <input type="number" id="org-order" value="0" class="admin-input !w-32" />
+          </div>
+          <div>
+            <label for="org-bio" class="admin-label">Bio / Profil</label>
+            <textarea id="org-bio" rows="4" maxlength="2000" placeholder="Ceritakan singkat tentang anggota ini..." class="admin-input"></textarea>
+          </div>
+          <div>
+            <p class="admin-label">Link Profil</p>
+            <div id="org-links" class="space-y-2 mb-2"></div>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" data-preset="LinkedIn" class="admin-btn-ghost">+ LinkedIn</button>
+              <button type="button" data-preset="Instagram" class="admin-btn-ghost">+ Instagram</button>
+              <button type="button" data-preset="Website" class="admin-btn-ghost">+ Website</button>
+              <button type="button" data-preset="" class="admin-btn-ghost">+ Link Lain</button>
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-3 px-6 py-4 border-t border-gray-100">
+          <button type="button" id="org-cancel" class="flex-1 admin-btn-secondary">Batal</button>
+          <button type="submit" id="org-save" class="flex-1 admin-btn-primary">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal crop foto -->
+  <div id="crop-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center px-4 admin-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="crop-title">
+    <div class="admin-modal max-w-lg max-h-[95vh] flex flex-col overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100">
+        <h2 id="crop-title" class="font-bold text-gray-800 text-lg">Atur Crop Foto</h2>
+        <p class="text-xs text-gray-500 mt-0.5">Geser dan ubah ukuran kotak, atau zoom foto. Area di dalam lingkaran yang akan tampil.</p>
+      </div>
+      <div class="p-4 bg-gray-900">
+        <div class="crop-stage"><img id="crop-image" alt="Foto yang akan di-crop" /></div>
+      </div>
+      <div class="px-6 py-4 space-y-3 border-t border-gray-100">
+        <div class="flex items-center gap-3">
+          <label for="crop-zoom" class="text-xs font-semibold text-gray-600 w-12">Zoom</label>
+          <input type="range" id="crop-zoom" min="0" max="100" value="0" class="flex-1 accent-[#C8102E]" />
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" data-crop="rotate-left" class="admin-btn-ghost">↺ Putar Kiri</button>
+          <button type="button" data-crop="rotate-right" class="admin-btn-ghost">↻ Putar Kanan</button>
+          <button type="button" data-crop="flip" class="admin-btn-ghost">⇋ Balik</button>
+          <button type="button" data-crop="reset" class="admin-btn-ghost">Reset</button>
+        </div>
+      </div>
+      <div class="flex gap-3 px-6 py-4 border-t border-gray-100">
+        <button type="button" id="crop-cancel" class="flex-1 admin-btn-secondary">Batal</button>
+        <button type="button" id="crop-apply" class="flex-1 admin-btn-primary">Gunakan Foto</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal hapus -->
+  <div id="del-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4 admin-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="del-title">
+    <div class="admin-modal max-w-sm p-6">
+      <h2 id="del-title" class="font-bold text-gray-800 text-lg mb-1">Hapus anggota?</h2>
+      <p id="del-text" class="text-sm text-gray-500 mb-6"></p>
+      <div class="flex gap-3">
+        <button type="button" id="del-cancel" class="flex-1 admin-btn-secondary">Batal</button>
+        <button type="button" id="del-ok" class="flex-1 admin-btn-primary">Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/components.js"></script>
+  <script src="/js/pages/admin-organizers.js"></script>
+</body>
+</html>

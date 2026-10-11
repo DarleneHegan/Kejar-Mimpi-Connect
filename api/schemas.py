@@ -172,3 +172,37 @@ class RegistrationListItem(RegistrationOut):
     """Versi admin: termasuk catatan internal penolakan (tidak dikirim ke endpoint publik)."""
     rejection_remarks: Optional[str] = None
     reviewed_at: Optional[datetime] = None
+
+
+# ---------- Organizer ----------
+class OrganizerLink(BaseModel):
+    label: str = Field(..., min_length=1, max_length=50)
+    # Hanya http/https supaya link tidak bisa dipakai untuk javascript: URL
+    url: str = Field(..., max_length=500, pattern=r"^https?://\S+$")
+
+
+class OrganizerBase(BaseModel):
+    name: str = Field(..., min_length=2, max_length=150)
+    role: str = Field(..., min_length=2, max_length=100)
+    affiliation: Optional[str] = Field(default=None, max_length=150)
+    # Foto hasil upload + crop di browser, dikirim sebagai data URL gambar (maks ~1 MB).
+    # Disimpan di database karena filesystem Vercel tidak persisten.
+    photo_url: Optional[str] = Field(
+        default=None,
+        max_length=1_400_000,
+        pattern=r"^data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$",
+    )
+    bio: Optional[str] = Field(default=None, max_length=2000)
+    links: List[OrganizerLink] = Field(default_factory=list, max_length=10)
+    order: int = 0
+
+
+class OrganizerCreate(OrganizerBase):
+    pass
+
+
+class OrganizerOut(OrganizerBase):
+    id: str
+
+    class Config:
+        from_attributes = True

@@ -6,7 +6,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 
 from api.database import Base, engine
-from api.routers import auth_router, events_router, registrations_router, checkin_router, form_fields_router
+from api.routers import (
+    auth_router,
+    events_router,
+    registrations_router,
+    checkin_router,
+    form_fields_router,
+    organizers_router,
+)
 
 app = FastAPI(
     title="Sistem Absensi & Pendaftaran Event",
@@ -29,6 +36,7 @@ app.include_router(events_router.router)
 app.include_router(form_fields_router.router)
 app.include_router(registrations_router.router)
 app.include_router(checkin_router.router)
+app.include_router(organizers_router.router)
 
 
 def _run_light_migrations():
@@ -76,6 +84,28 @@ def on_startup():
     # Membuat tabel otomatis jika belum ada (aman dipanggil berulang kali).
     Base.metadata.create_all(bind=engine)
     _run_light_migrations()
+    _seed_default_organizer()
+
+
+def _seed_default_organizer():
+    """Isi 1 profil organizer contoh jika tabel masih kosong, supaya halaman About tidak kosong."""
+    from api.database import SessionLocal
+    from api.models import Organizer
+
+    db = SessionLocal()
+    try:
+        if db.query(Organizer).count() == 0:
+            db.add(Organizer(
+                name="Nama Organizer",
+                role="Lead Organizer",
+                affiliation="Kejar Mimpi Jakarta",
+                bio="Profil contoh. Ubah atau hapus lewat menu Kelola Organizer di panel admin.",
+                links=[],
+                order=0,
+            ))
+            db.commit()
+    finally:
+        db.close()
 
 
 @app.get("/api/health")
