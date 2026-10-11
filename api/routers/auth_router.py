@@ -14,7 +14,8 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 @router.post("/login", response_model=AdminLoginResponse)
 def login(payload: AdminLoginRequest, db: Session = Depends(get_db)):
-    admin = db.query(Admin).filter(Admin.email == payload.email).first()
+    email = payload.email.strip().lower()
+    admin = db.query(Admin).filter(Admin.email == email).first()
     if not admin or not verify_password(payload.password, admin.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

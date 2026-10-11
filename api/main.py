@@ -13,6 +13,7 @@ from api.routers import (
     checkin_router,
     form_fields_router,
     organizers_router,
+    admins_router,
 )
 
 app = FastAPI(
@@ -37,6 +38,7 @@ app.include_router(form_fields_router.router)
 app.include_router(registrations_router.router)
 app.include_router(checkin_router.router)
 app.include_router(organizers_router.router)
+app.include_router(admins_router.router)
 
 
 def _run_light_migrations():
@@ -52,6 +54,10 @@ def _run_light_migrations():
     is_sqlite = engine.url.get_backend_name() == "sqlite"
 
     statements = []
+    if "admins" in inspector.get_table_names():
+        admin_cols = {c["name"] for c in inspector.get_columns("admins")}
+        if "username" not in admin_cols:
+            statements.append("ALTER TABLE admins ADD COLUMN username VARCHAR")
     if "events" in inspector.get_table_names():
         existing_cols = {c["name"] for c in inspector.get_columns("events")}
         bool_false = "0" if is_sqlite else "FALSE"

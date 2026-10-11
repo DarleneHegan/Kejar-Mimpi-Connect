@@ -170,3 +170,20 @@ async function updateOrganizer(id, payload) {
 async function deleteOrganizer(id) {
   return apiFetch(`/api/organizers/${id}`, { method: "DELETE" }, true);
 }
+
+// ---------- Admin management ----------
+async function fetchAdmins() {
+  return apiFetch("/api/admins", {}, true);
+}
+
+async function inviteAdmin(payload) {
+  return apiFetch("/api/admins", { method: "POST", body: payload }, true);
+}
+
+async function deleteAdmin(id) {
+  return apiFetch(`/api/admins/${id}`, { method: "DELETE" }, true);
+}
+
+async function updateAdmin(id, payload) {
+  return apiFetch(`/api/admins/${id}`, { method: "PUT", body: payload }, true);
+}

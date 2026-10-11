@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Management - Kejar Mimpi Jakarta Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/jpeg" href="/images/logo-kejar-mimpi.jpg" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <div class="flex h-screen overflow-hidden">
+    <aside id="admin-sidebar-slot" class="hidden md:block w-64 bg-white border-r border-gray-100 flex-shrink-0"></aside>
+
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <header class="md:hidden bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
+        <span class="font-bold text-gray-800">Kejar Mimpi Jakarta <span class="text-[#C8102E]">Admin</span></span>
+        <button id="admin-mobile-menu-btn" class="p-2 text-gray-600" aria-label="Menu">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+        </button>
+      </header>
+
+      <main class="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="admin-hero">
+          <div class="admin-hero-glow"></div>
+          <div class="relative flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div>
+              <p class="admin-hero-eyebrow">Akses Admin</p>
+              <h1 class="text-2xl font-extrabold">User Management</h1>
+              <p class="text-sm text-white/80 mt-1 max-w-xl">Tambahkan admin baru secara manual. Admin yang diundang cukup login dengan email dan password yang kamu buat.</p>
+            </div>
+            <button id="add-btn" class="admin-hero-btn flex items-center gap-2 self-start sm:self-auto">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
+              Tambah Admin
+            </button>
+          </div>
+        </div>
+
+        <div id="loading-state" class="flex justify-center py-16"><div class="spinner"></div></div>
+
+        <div id="table-wrap" class="hidden admin-card overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm admin-table">
+              <thead>
+                <tr>
+                  <th class="text-left px-5 py-3 font-semibold">Nama</th>
+                  <th class="text-left px-5 py-3 font-semibold">Email</th>
+                  <th class="text-left px-5 py-3 font-semibold">Ditambahkan</th>
+                  <th class="text-right px-5 py-3 font-semibold">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="admin-table-body" class="divide-y divide-gray-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal tambah admin -->
+  <div id="admin-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4 admin-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="admin-modal-title">
+    <div class="admin-modal max-w-md max-h-[90vh] flex flex-col overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <h2 id="admin-modal-title" class="font-bold text-gray-800 text-lg">Tambah Admin</h2>
+        <button type="button" id="admin-close" aria-label="Tutup" class="text-gray-400 hover:text-gray-600 p-1">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      <form id="admin-form" class="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+        <div>
+          <label for="a-name" class="admin-label">Nama Lengkap <span class="text-[#C8102E]">*</span></label>
+          <input type="text" id="a-name" required minlength="2" maxlength="150" class="admin-input" />
+        </div>
+        <div>
+          <label for="a-email" class="admin-label">Email <span class="text-[#C8102E]">*</span></label>
+          <input type="email" id="a-email" required class="admin-input" />
+        </div>
+        <div>
+          <label for="a-password" class="admin-label"><span id="a-password-label">Password</span> <span id="a-password-req" class="text-[#C8102E]">*</span></label>
+          <div class="relative">
+            <input type="password" id="a-password" minlength="6" maxlength="200" class="admin-input pr-20" />
+            <button type="button" id="a-toggle-pw" class="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-semibold text-gray-500 hover:text-[#C8102E] px-2 py-1">Lihat</button>
+          </div>
+          <p id="a-password-hint" class="text-xs text-gray-400 mt-1">Minimal 6 karakter. Beritahukan ke admin baru untuk login pertama kali.</p>
+        </div>
+      </form>
+      <div class="flex gap-3 px-6 py-4 border-t border-gray-100">
+        <button type="button" id="admin-cancel" class="flex-1 admin-btn-secondary">Batal</button>
+        <button type="submit" form="admin-form" id="admin-save" class="flex-1 admin-btn-primary">Tambah Admin</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal hapus -->
+  <div id="del-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4 admin-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="del-title">
+    <div class="admin-modal max-w-sm p-6">
+      <h2 id="del-title" class="font-bold text-gray-800 text-lg mb-1">Hapus admin?</h2>
+      <p id="del-text" class="text-sm text-gray-500 mb-6"></p>
+      <div class="flex gap-3">
+        <button type="button" id="del-cancel" class="flex-1 admin-btn-secondary">Batal</button>
+        <button type="button" id="del-ok" class="flex-1 admin-btn-primary">Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/components.js"></script>
+  <script src="/js/pages/admin-users.js"></script>
+</body>
+</html>

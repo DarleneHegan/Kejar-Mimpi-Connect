@@ -8,7 +8,7 @@ from pydantic import BaseModel, EmailStr, Field
 
 # ---------- Auth ----------
 class AdminLoginRequest(BaseModel):
-    email: EmailStr
+    email: str
     password: str
 
 
@@ -16,6 +16,31 @@ class AdminLoginResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     admin_name: str
+
+
+# ---------- Admin management (invite) ----------
+class AdminCreate(BaseModel):
+    # Dibuat fleksibel: cukup nama, email, dan password. Divalidasi ringan saja.
+    name: str = Field(..., min_length=1, max_length=150)
+    email: str = Field(..., min_length=3, max_length=200)
+    password: str = Field(..., min_length=1, max_length=200)
+
+
+class AdminUpdate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=150)
+    email: str = Field(..., min_length=3, max_length=200)
+    # Kosongkan jika tidak ingin mengubah password
+    password: Optional[str] = Field(default=None, max_length=200)
+
+
+class AdminOut(BaseModel):
+    id: str
+    name: str
+    email: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
 
 
 # ---------- Event ----------
