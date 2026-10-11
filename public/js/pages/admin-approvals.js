@@ -168,19 +168,20 @@ function renderRow(reg) {
         </div>`
       : "";
 
+  const displayName = reg.full_name || reg.email || "Peserta";
   return `
   <div class="group flex items-center gap-4 px-5 py-3.5 transition-colors ${checked ? "bg-red-50/60" : "hover:bg-gray-50"}">
     ${
       isPending
         ? `<input type="checkbox" data-select="${reg.id}" ${checked ? "checked" : ""}
-            class="w-5 h-5 rounded-md border-gray-300 text-[#C8102E] focus:ring-[#C8102E] cursor-pointer" aria-label="Pilih ${escapeHtml(reg.full_name)}" />`
+            class="w-5 h-5 rounded-md border-gray-300 text-[#C8102E] focus:ring-[#C8102E] cursor-pointer" aria-label="Pilih ${escapeHtml(displayName)}" />`
         : ""
     }
-    <div class="w-10 h-10 flex-shrink-0 rounded-full bg-gradient-to-br ${avatarColor(reg.full_name)} text-white text-sm font-bold flex items-center justify-center shadow-sm">
-      ${escapeHtml(initials(reg.full_name))}
+    <div class="w-10 h-10 flex-shrink-0 rounded-full bg-gradient-to-br ${avatarColor(displayName)} text-white text-sm font-bold flex items-center justify-center shadow-sm">
+      ${escapeHtml(initials(displayName))}
     </div>
     <div class="min-w-0 flex-1">
-      <p class="font-semibold text-gray-800 truncate">${escapeHtml(reg.full_name)}</p>
+      <p class="font-semibold text-gray-800 truncate">${escapeHtml(displayName)}</p>
       <p class="text-xs text-gray-400 mt-0.5">${meta}</p>
       ${remarksHtml}
     </div>
@@ -419,15 +420,13 @@ function openReviewModal(registrationId) {
   if (!reg) return;
   reviewRegistrationId = registrationId;
 
-  document.getElementById("review-name").textContent = reg.full_name;
+  document.getElementById("review-name").textContent = reg.full_name || reg.email || "Peserta";
   document.getElementById("review-time").textContent = `Daftar pada ${formatDateTime(reg.created_at)}`;
 
+  // Form sepenuhnya custom: tampilkan semua jawaban sesuai pertanyaan yang dibuat admin.
   const answers = reg.custom_answers || {};
   const items = [
     renderStatusBanner(reg),
-    renderReviewItem("Nama Lengkap", reg.full_name),
-    renderReviewItem("Email", reg.email),
-    renderReviewItem("No. HP", reg.phone),
     ...selectedEventFieldsApproval.map((f) => renderReviewItem(f.label, answers[f.id])),
   ];
   const body = document.getElementById("review-body");

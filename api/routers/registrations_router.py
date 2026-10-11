@@ -26,10 +26,9 @@ from api.utils import generate_qr_base64
 router = APIRouter(prefix="/api", tags=["registrations"])
 
 
-def _validate_custom_answers(event: Event, db: Session, answers: Optional[dict]) -> dict:
+def _validate_custom_answers(fields, answers: Optional[dict]) -> dict:
     """Validasi jawaban custom form field terhadap definisi field event (required, tipe opsi)."""
     answers = answers or {}
-    fields = db.query(EventFormField).filter(EventFormField.event_id == event.id).all()
     cleaned = {}
     for field in fields:
         value = answers.get(field.id)
@@ -46,6 +45,37 @@ def _validate_custom_answers(event: Event, db: Session, answers: Optional[dict])
                 raise HTTPException(status_code=400, detail=f"Pilihan untuk '{field.label}' tidak valid")
         cleaned[field.id] = value
     return cleaned
+
+
+def _derive_identity(fields, answers: dict):
+    """
+    Turunkan nama/email/HP tampilan dari jawaban form (untuk laporan, absensi, approval).
+    - Nama: field email/name pertama yang terisi, prioritas field bertipe text.
+    - Email: field pertama bertipe email yang terisi.
+    - HP: field pertama bertipe phone yang terisi.
+    """
+    def val(v):
+        return ", ".join(v) if isinstance(v, list) else str(v)
+
+    name = email = phone = None
+    first_text = None
+    for field in fields:
+        value = answers.get(field.id)
+        if value is None or value == "" or value == []:
+            continue
+        if field.field_type == "email" and email is None:
+            email = val(value)
+        elif field.field_type == "phone" and phone is None:
+            phone = val(value)
+        elif field.field_type in ("text", "textarea") and first_text is None:
+            first_text = val(value)
+    # Nama tampilan: pakai field teks pertama; jika tidak ada, pakai email
+    name = first_text or email
+    return name, email, phone
+
+
+def display_name(registration) -> str:
+    return registration.full_name or registration.email or "Peserta"
 
 
 @router.post("/events/{event_id}/register", response_model=RegistrationConfirmOut, status_code=201)
@@ -74,29 +104,36 @@ def register_for_event(
         if current_count >= event.quota:
             raise HTTPException(status_code=400, detail="Kuota event sudah penuh")
 
-    existing = (
-        db.query(Registration)
-        .filter(
-            Registration.event_id == event_id,
-            Registration.email == payload.email,
-            Registration.status != "rejected",
-        )
-        .first()
-    )
-    if existing:
-        raise HTTPException(
-            status_code=400, detail="Email ini sudah terdaftar untuk event ini"
-        )
+    fields = db.query(EventFormField).filter(EventFormField.event_id == event.id).all()
+    if not fields:
+        raise HTTPException(status_code=400, detail="Form pendaftaran event ini belum disiapkan")
 
-    cleaned_answers = _validate_custom_answers(event, db, payload.answers)
+    cleaned_answers = _validate_custom_answers(fields, payload.answers)
+    full_name, email, phone = _derive_identity(fields, cleaned_answers)
+
+    # Cegah pendaftaran ganda hanya jika form punya field email dan email terisi.
+    if email:
+        existing = (
+            db.query(Registration)
+            .filter(
+                Registration.event_id == event_id,
+                Registration.email == email,
+                Registration.status != "rejected",
+            )
+            .first()
+        )
+        if existing:
+            raise HTTPException(
+                status_code=400, detail="Email ini sudah terdaftar untuk event ini"
+            )
 
     status_value = "pending" if event.requires_approval else "confirmed"
 
     registration = Registration(
         event_id=event_id,
-        full_name=payload.full_name,
-        email=payload.email,
-        phone=payload.phone,
+        full_name=full_name,
+        email=email,
+        phone=phone,
         custom_answers=cleaned_answers or None,
         status=status_value,
     )
@@ -152,7 +189,7 @@ def list_registrations_for_event(
         like = f"%{search}%"
         query = query.filter(
             (Registration.full_name.ilike(like)) | (Registration.email.ilike(like))
-        )
+        )  # full_name/email NULL otomatis tidak cocok, aman
     if status:
         query = query.filter(Registration.status == status)
     query = query.order_by(Registration.created_at.asc())
@@ -196,7 +233,7 @@ def approve_registration(
 
     return RegistrationApprovalResponse(
         success=True,
-        message=f"Pendaftaran '{registration.full_name}' telah disetujui",
+        message=f"Pendaftaran '{display_name(registration)}' telah disetujui",
         registration=RegistrationOut.model_validate(registration),
     )
 
@@ -226,7 +263,7 @@ def reject_registration(
 
     return RegistrationApprovalResponse(
         success=True,
-        message=f"Pendaftaran '{registration.full_name}' telah ditolak",
+        message=f"Pendaftaran '{display_name(registration)}' telah ditolak",
         registration=RegistrationOut.model_validate(registration),
     )
 

@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from api.database import get_db
 from api.models import Registration, Admin
 from api.schemas import CheckInRequest, CheckInResponse, RegistrationOut
+from api.routers.registrations_router import display_name
 from api.auth import get_current_admin
 
 router = APIRouter(prefix="/api/checkin", tags=["checkin"])
@@ -32,20 +33,20 @@ def check_in(
     if registration.status == "pending":
         return CheckInResponse(
             success=False,
-            message=f"Pendaftaran '{registration.full_name}' masih menunggu approval admin, belum bisa check-in",
+            message=f"Pendaftaran '{display_name(registration)}' masih menunggu approval admin, belum bisa check-in",
             registration=RegistrationOut.model_validate(registration),
         )
     if registration.status == "rejected":
         return CheckInResponse(
             success=False,
-            message=f"Pendaftaran '{registration.full_name}' telah ditolak, tidak bisa check-in",
+            message=f"Pendaftaran '{display_name(registration)}' telah ditolak, tidak bisa check-in",
             registration=RegistrationOut.model_validate(registration),
         )
 
     if registration.is_checked_in:
         return CheckInResponse(
             success=False,
-            message=f"Peserta '{registration.full_name}' sudah check-in sebelumnya pada "
+            message=f"Peserta '{display_name(registration)}' sudah check-in sebelumnya pada "
             f"{registration.checked_in_at.strftime('%d-%m-%Y %H:%M') if registration.checked_in_at else '-'}",
             registration=RegistrationOut.model_validate(registration),
         )
@@ -57,7 +58,7 @@ def check_in(
 
     return CheckInResponse(
         success=True,
-        message=f"Check-in berhasil untuk '{registration.full_name}'",
+        message=f"Check-in berhasil untuk '{display_name(registration)}'",
         registration=RegistrationOut.model_validate(registration),
     )
 
@@ -76,20 +77,20 @@ def check_in_manual_by_id(
     if registration.status == "pending":
         return CheckInResponse(
             success=False,
-            message=f"Pendaftaran '{registration.full_name}' masih menunggu approval admin, belum bisa check-in",
+            message=f"Pendaftaran '{display_name(registration)}' masih menunggu approval admin, belum bisa check-in",
             registration=RegistrationOut.model_validate(registration),
         )
     if registration.status == "rejected":
         return CheckInResponse(
             success=False,
-            message=f"Pendaftaran '{registration.full_name}' telah ditolak, tidak bisa check-in",
+            message=f"Pendaftaran '{display_name(registration)}' telah ditolak, tidak bisa check-in",
             registration=RegistrationOut.model_validate(registration),
         )
 
     if registration.is_checked_in:
         return CheckInResponse(
             success=False,
-            message=f"Peserta '{registration.full_name}' sudah check-in sebelumnya",
+            message=f"Peserta '{display_name(registration)}' sudah check-in sebelumnya",
             registration=RegistrationOut.model_validate(registration),
         )
 
@@ -100,6 +101,6 @@ def check_in_manual_by_id(
 
     return CheckInResponse(
         success=True,
-        message=f"Check-in berhasil untuk '{registration.full_name}'",
+        message=f"Check-in berhasil untuk '{display_name(registration)}'",
         registration=RegistrationOut.model_validate(registration),
     )

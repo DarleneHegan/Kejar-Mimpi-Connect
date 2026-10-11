@@ -79,8 +79,8 @@ function registrationStatusBadge(reg) {
 function renderReportRow(reg) {
   return `
   <tr>
-    <td class="px-5 py-3.5 font-medium text-gray-800">${reg.full_name}</td>
-    <td class="px-5 py-3.5 text-gray-600">${reg.email}</td>
+    <td class="px-5 py-3.5 font-medium text-gray-800">${reg.full_name || "-"}</td>
+    <td class="px-5 py-3.5 text-gray-600">${reg.email || "-"}</td>
     <td class="px-5 py-3.5 text-gray-600">${reg.phone || "-"}</td>
     <td class="px-5 py-3.5 text-gray-500">${formatDateTime(reg.created_at)}</td>
     <td class="px-5 py-3.5">${registrationStatusBadge(reg)}</td>
@@ -110,8 +110,8 @@ function exportToCsv() {
 
   const headers = ["Nama", "Email", "No. HP", "Waktu Daftar", "Status", "Waktu Check-in"];
   const rows = currentRegistrations.map((r) => [
-    r.full_name,
-    r.email,
+    r.full_name || "",
+    r.email || "",
     r.phone || "",
     formatDateTime(r.created_at),
     r.is_checked_in ? "Hadir" : "Belum Hadir",

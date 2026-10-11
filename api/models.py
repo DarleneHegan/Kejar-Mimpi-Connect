@@ -76,8 +76,10 @@ class Registration(Base):
 
     id = Column(String, primary_key=True, default=gen_uuid)
     event_id = Column(String, ForeignKey("events.id"), nullable=False, index=True)
-    full_name = Column(String, nullable=False)
-    email = Column(String, nullable=False, index=True)
+    # Diturunkan dari jawaban form (field bertipe text pertama / email pertama).
+    # Nullable karena form sepenuhnya custom; peserta bisa saja tidak ditanya nama/email.
+    full_name = Column(String, nullable=True)
+    email = Column(String, nullable=True, index=True)
     phone = Column(String, nullable=True)
     custom_answers = Column(JSON, nullable=True)  # {field_id: jawaban}
     ticket_token = Column(String, unique=True, nullable=False, index=True, default=gen_uuid)

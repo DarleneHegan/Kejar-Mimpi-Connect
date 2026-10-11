@@ -166,6 +166,12 @@ async function loadEventDetail() {
     } catch (err) {
       currentFormFields = [];
     }
+    // Form sepenuhnya dari field custom. Jika admin belum menyiapkannya, sembunyikan tombol daftar.
+    if (currentFormFields.length === 0) {
+      document.getElementById("submit-btn").classList.add("hidden");
+      document.getElementById("register-footer-note").classList.add("hidden");
+      document.getElementById("no-fields-note").classList.remove("hidden");
+    }
     if (event.requires_approval) {
       document.getElementById("register-footer-note").textContent =
         "Pendaftaranmu akan diperiksa admin terlebih dahulu. Tiket (QR code) baru terbit setelah disetujui.";
@@ -189,9 +195,6 @@ async function handleRegisterSubmit(e) {
   const submitSpinner = document.getElementById("submit-spinner");
 
   const payload = {
-    full_name: document.getElementById("full_name").value.trim(),
-    email: document.getElementById("email").value.trim(),
-    phone: document.getElementById("phone").value.trim() || null,
     answers: collectCustomAnswers(),
   };
 

@@ -107,17 +107,16 @@ class EventFormFieldsReplaceRequest(BaseModel):
 
 # ---------- Registration ----------
 class RegistrationCreate(BaseModel):
-    full_name: str = Field(..., min_length=2, max_length=150)
-    email: EmailStr
-    phone: Optional[str] = Field(default=None, max_length=30)
-    answers: Optional[Dict[str, Any]] = None  # {field_id: jawaban} untuk custom form field
+    # Form pendaftaran sepenuhnya custom: semua jawaban dikirim lewat `answers`.
+    # full_name/email/phone opsional dan otomatis diturunkan dari jawaban di server.
+    answers: Dict[str, Any] = Field(default_factory=dict)  # {field_id: jawaban}
 
 
 class RegistrationOut(BaseModel):
     id: str
     event_id: str
-    full_name: str
-    email: str
+    full_name: Optional[str] = None
+    email: Optional[str] = None
     phone: Optional[str] = None
     custom_answers: Optional[Dict[str, Any]] = None
     ticket_token: str

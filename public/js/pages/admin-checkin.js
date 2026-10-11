@@ -144,16 +144,17 @@ function avatarColor(name) {
 }
 
 function renderSearchResultItem(reg) {
+  const displayName = reg.full_name || reg.email || "Peserta";
   const meta = reg.is_checked_in && reg.checked_in_at
     ? `Hadir ${formatDateTime(reg.checked_in_at)}`
-    : escapeHtml(reg.email);
+    : escapeHtml(reg.email || "");
   return `
   <div class="flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 transition-colors">
-    <div class="w-10 h-10 flex-shrink-0 rounded-full bg-gradient-to-br ${avatarColor(reg.full_name)} text-white text-sm font-bold flex items-center justify-center shadow-sm">
-      ${escapeHtml(initials(reg.full_name))}
+    <div class="w-10 h-10 flex-shrink-0 rounded-full bg-gradient-to-br ${avatarColor(displayName)} text-white text-sm font-bold flex items-center justify-center shadow-sm">
+      ${escapeHtml(initials(displayName))}
     </div>
     <div class="min-w-0 flex-1">
-      <p class="font-semibold text-gray-800 truncate">${escapeHtml(reg.full_name)}</p>
+      <p class="font-semibold text-gray-800 truncate">${escapeHtml(displayName)}</p>
       <p class="text-xs text-gray-400 mt-0.5 truncate">${meta}</p>
     </div>
     ${
@@ -191,7 +192,7 @@ function renderTabs(lists) {
 function renderList() {
   const term = document.getElementById("search-name-input").value.trim().toLowerCase();
   const matched = term
-    ? allConfirmed.filter((r) => r.full_name.toLowerCase().includes(term) || r.email.toLowerCase().includes(term))
+    ? allConfirmed.filter((r) => (r.full_name || "").toLowerCase().includes(term) || (r.email || "").toLowerCase().includes(term))
     : allConfirmed;
   const lists = {
     absent: matched.filter((r) => !r.is_checked_in),
