@@ -54,6 +54,15 @@ def _run_light_migrations():
     is_sqlite = engine.url.get_backend_name() == "sqlite"
 
     statements = []
+    if "event_form_fields" in inspector.get_table_names():
+        ff_cols = {c["name"] for c in inspector.get_columns("event_form_fields")}
+        if "description" not in ff_cols:
+            statements.append("ALTER TABLE event_form_fields ADD COLUMN description TEXT")
+        if "show_description" not in ff_cols:
+            statements.append(
+                "ALTER TABLE event_form_fields ADD COLUMN show_description BOOLEAN DEFAULT "
+                + ("0" if is_sqlite else "FALSE")
+            )
     if "admins" in inspector.get_table_names():
         admin_cols = {c["name"] for c in inspector.get_columns("admins")}
         if "username" not in admin_cols:

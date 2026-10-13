@@ -32,7 +32,7 @@ class Event(Base):
     title = Column(String, nullable=False)
     description = Column(Text, nullable=True)
     location = Column(String, nullable=True)
-    image_url = Column(String, nullable=True)
+    image_url = Column(Text, nullable=True)  # data URL hasil upload+crop (atau URL lama)
     category = Column(String, nullable=True)
     start_time = Column(DateTime, nullable=False)
     end_time = Column(DateTime, nullable=True)
@@ -66,6 +66,9 @@ class EventFormField(Base):
     field_type = Column(String, nullable=False, default="text")  # text|number|email|phone|textarea|dropdown|radio|checkbox
     options = Column(JSON, nullable=True)  # list[str], dipakai untuk dropdown/radio/checkbox
     is_required = Column(Boolean, default=False)
+    # Penjelasan pertanyaan untuk peserta; hanya tampil jika show_description aktif.
+    description = Column(Text, nullable=True)
+    show_description = Column(Boolean, default=False)
     order = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.utcnow)
 

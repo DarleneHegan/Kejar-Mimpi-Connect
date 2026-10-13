@@ -67,6 +67,8 @@ def replace_form_fields(
             field_type=f.field_type,
             options=f.options,
             is_required=f.is_required,
+            description=(f.description or "").strip() or None,
+            show_description=bool(f.show_description and (f.description or "").strip()),
             order=f.order if f.order else idx,
         )
         db.add(field)

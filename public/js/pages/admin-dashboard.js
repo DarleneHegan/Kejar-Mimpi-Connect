@@ -269,6 +269,154 @@ function resetForm() {
   document.getElementById("requires_approval").checked = false;
   formBuilderFields = [];
   renderFormFieldsList();
+  removeEventImage();
+}
+
+// ---------- Upload & atur ukuran gambar event ----------
+const EVENT_IMG_MAX_UPLOAD = 10 * 1024 * 1024;
+const EVENT_IMG_MAX_WIDTH = 1280; // px, sisi terpanjang hasil
+let eventImageData = null; // data URL hasil crop (atau URL lama) yang disimpan
+let eventImageSource = null; // object URL file asli, untuk atur ulang
+let eventCropper = null;
+let eventCropRatio = 16 / 9;
+
+function updateEventImagePreview() {
+  const img = document.getElementById("event-image-img");
+  const empty = document.getElementById("event-image-empty");
+  const has = !!eventImageData;
+  img.classList.toggle("hidden", !has);
+  empty.classList.toggle("hidden", has);
+  if (has) img.src = eventImageData;
+  else img.removeAttribute("src");
+  document.getElementById("event-image-btn-text").textContent = has ? "Ganti Gambar" : "Upload Gambar";
+  document.getElementById("event-image-remove").classList.toggle("hidden", !has);
+  document.getElementById("event-image-recrop").classList.toggle("hidden", !eventImageSource);
+}
+
+function removeEventImage() {
+  eventImageData = null;
+  if (eventImageSource) URL.revokeObjectURL(eventImageSource);
+  eventImageSource = null;
+  updateEventImagePreview();
+}
+
+function handleEventImageSelected(e) {
+  const file = e.target.files[0];
+  e.target.value = ""; // supaya file yang sama bisa dipilih lagi
+  if (!file) return;
+  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+    showToast("Format gambar harus JPG, PNG, atau WEBP", "error");
+    return;
+  }
+  if (file.size > EVENT_IMG_MAX_UPLOAD) {
+    showToast("Ukuran gambar maksimal 10 MB", "error");
+    return;
+  }
+  if (eventImageSource) URL.revokeObjectURL(eventImageSource);
+  eventImageSource = URL.createObjectURL(file);
+  openEventCropper();
+}
+
+function setActiveRatioButton() {
+  document.querySelectorAll(".ratio-btn").forEach((b) => {
+    const r = Number(b.dataset.ratio);
+    const active = (r === 0 && !eventCropRatio) || (r && Math.abs(r - eventCropRatio) < 0.01);
+    b.classList.toggle("is-active", !!active);
+  });
+}
+
+// Cadangan jika library crop (CDN) gagal dimuat: gambar tetap bisa dipakai,
+// hanya diperkecil otomatis tanpa pengaturan crop.
+function useImageWithoutCrop() {
+  const img = new Image();
+  img.onload = () => {
+    const scale = Math.min(1, EVENT_IMG_MAX_WIDTH / Math.max(img.width, img.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(img.width * scale);
+    canvas.height = Math.round(img.height * scale);
+    const c = canvas.getContext("2d");
+    c.fillStyle = "#fff";
+    c.fillRect(0, 0, canvas.width, canvas.height);
+    c.drawImage(img, 0, 0, canvas.width, canvas.height);
+    eventImageData = canvas.toDataURL("image/jpeg", 0.82);
+    updateEventImagePreview();
+    showToast("Fitur atur ukuran tidak tersedia (cek koneksi internet). Gambar dipakai apa adanya.", "info");
+  };
+  img.onerror = () => showToast("Gambar tidak bisa dibaca, coba file lain", "error");
+  img.src = eventImageSource;
+}
+
+function openEventCropper() {
+  if (typeof Cropper === "undefined") {
+    useImageWithoutCrop();
+    return;
+  }
+  const img = document.getElementById("event-crop-image");
+  document.getElementById("event-crop-modal").classList.remove("hidden");
+  if (eventCropper) eventCropper.destroy();
+  setActiveRatioButton();
+  img.onload = () => {
+    eventCropper = new Cropper(img, {
+      aspectRatio: eventCropRatio || NaN,
+      viewMode: 1,
+      dragMode: "move",
+      autoCropArea: 0.9,
+      background: false,
+      responsive: true,
+      ready() {
+        document.getElementById("event-crop-zoom").value = 0;
+        const d = eventCropper.getImageData();
+        eventCropper.baseRatio = d.width / d.naturalWidth;
+      },
+    });
+  };
+  img.src = eventImageSource;
+}
+
+function closeEventCropper() {
+  document.getElementById("event-crop-modal").classList.add("hidden");
+  if (eventCropper) {
+    eventCropper.destroy();
+    eventCropper = null;
+  }
+}
+
+function applyEventCrop() {
+  if (!eventCropper) return;
+  const box = eventCropper.getData(true);
+  // Perkecil agar sisi terpanjang maks 1280px supaya tidak memberatkan halaman
+  const scale = Math.min(1, EVENT_IMG_MAX_WIDTH / Math.max(box.width, box.height));
+  const canvas = eventCropper.getCroppedCanvas({
+    width: Math.round(box.width * scale),
+    height: Math.round(box.height * scale),
+    fillColor: "#fff",
+    imageSmoothingQuality: "high",
+  });
+  eventImageData = canvas.toDataURL("image/jpeg", 0.82);
+  closeEventCropper();
+  updateEventImagePreview();
+}
+
+function handleEventCropControl(action) {
+  if (!eventCropper) return;
+  if (action === "rotate-left") eventCropper.rotate(-90);
+  if (action === "rotate-right") eventCropper.rotate(90);
+  if (action === "reset") {
+    eventCropper.reset();
+    document.getElementById("event-crop-zoom").value = 0;
+  }
+}
+
+function handleEventRatio(value) {
+  eventCropRatio = Number(value) || 0;
+  if (eventCropper) eventCropper.setAspectRatio(eventCropRatio || NaN);
+  setActiveRatioButton();
+}
+
+function handleEventZoom(e) {
+  if (!eventCropper || !eventCropper.baseRatio) return;
+  // Slider 0-100 -> zoom 1x sampai 4x dari ukuran awal
+  eventCropper.zoomTo(eventCropper.baseRatio * (1 + (Number(e.target.value) / 100) * 3));
 }
 
 function openCreateModal() {
@@ -293,6 +441,8 @@ async function loadFormFieldsIntoBuilder(eventId) {
         field_type: f.field_type,
         options: (f.options || []).join(", "),
         is_required: f.is_required,
+        description: f.description || "",
+        show_description: !!f.show_description,
       }));
   } catch (err) {
     showToast(err.message || "Gagal memuat form pendaftaran", "error");
@@ -315,7 +465,8 @@ async function openEditModal(eventId) {
   document.getElementById("start_time").value = toLocalDatetimeInputValue(event.start_time);
   document.getElementById("end_time").value = toLocalDatetimeInputValue(event.end_time);
   document.getElementById("location").value = event.location || "";
-  document.getElementById("image_url").value = event.image_url || "";
+  eventImageData = event.image_url || null;
+  updateEventImagePreview();
   document.getElementById("description").value = event.description || "";
   document.getElementById("requires_approval").checked = event.requires_approval;
 
@@ -337,6 +488,11 @@ function getFormFieldsError() {
       if (opts.length === 0) return `Pertanyaan "${field.label}" butuh minimal 1 pilihan jawaban`;
     }
   }
+  for (const field of formBuilderFields) {
+    if (field.show_description && !(field.description || "").trim()) {
+      return `Deskripsi untuk "${field.label}" masih kosong. Isi deskripsinya atau matikan tombol Deskripsi.`;
+    }
+  }
   return null;
 }
 
@@ -348,6 +504,8 @@ function buildFormFieldsPayload() {
       ? (field.options || "").split(",").map((o) => o.trim()).filter(Boolean)
       : null,
     is_required: field.is_required,
+    description: (field.description || "").trim() || null,
+    show_description: !!field.show_description,
     order: idx,
   }));
 }
@@ -355,7 +513,7 @@ function buildFormFieldsPayload() {
 // Validasi kedua tab. Jika ada yang kurang, pindah ke tab tersebut dan tunjukkan errornya.
 function validateBeforeSubmit() {
   const invalidInfo = REQUIRED_INFO_IDS.map((id) => document.getElementById(id)).find((el) => !el.checkValidity())
-    || ["quota", "image_url", "end_time"].map((id) => document.getElementById(id)).find((el) => !el.checkValidity());
+    || ["quota", "end_time"].map((id) => document.getElementById(id)).find((el) => !el.checkValidity());
   if (invalidInfo) {
     switchModalTab("info");
     showToast("Info Event belum lengkap atau ada isian yang tidak valid", "error");
@@ -407,7 +565,7 @@ async function handleEventFormSubmit(e) {
     start_time: new Date(document.getElementById("start_time").value).toISOString(),
     end_time: endTimeValue ? new Date(endTimeValue).toISOString() : null,
     location: document.getElementById("location").value.trim() || null,
-    image_url: document.getElementById("image_url").value.trim() || null,
+    image_url: eventImageData,
     description: document.getElementById("description").value.trim() || null,
     requires_approval: document.getElementById("requires_approval").checked,
   };
@@ -471,6 +629,17 @@ function renderFormFieldRow(field, index) {
             <input type="checkbox" data-field-required ${field.is_required ? "checked" : ""} class="w-4 h-4 rounded border-gray-300 text-[#C8102E] focus:ring-[#C8102E]" />
             Wajib diisi
           </label>
+          <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+            <span class="desc-switch">
+              <input type="checkbox" data-field-desc-toggle ${field.show_description ? "checked" : ""} class="sr-only" />
+              <span class="desc-switch-track" aria-hidden="true"></span>
+            </span>
+            Deskripsi
+          </label>
+        </div>
+        <div data-desc-wrap class="${field.show_description ? "" : "hidden"}">
+          <label class="block text-xs font-medium text-gray-500 mb-1">Deskripsi pertanyaan (tampil di form peserta)</label>
+          <textarea data-field-desc rows="2" maxlength="1000" placeholder="misal: Upload CV ke Google Drive, lalu tempel link yang bisa diakses publik" aria-label="Deskripsi pertanyaan ${index + 1}" class="admin-input text-sm">${escapeHtml(field.description || "")}</textarea>
         </div>
         <div class="${needsOptions ? "" : "hidden"}">
           <label class="block text-xs font-medium text-gray-500 mb-1">Pilihan jawaban (pisahkan dengan koma)</label>
@@ -508,6 +677,17 @@ function renderFormFieldsList() {
     row.querySelector("[data-field-required]").addEventListener("change", (e) => {
       field.is_required = e.target.checked;
     });
+    row.querySelector("[data-field-desc-toggle]").addEventListener("change", (e) => {
+      field.show_description = e.target.checked;
+      const wrap = row.querySelector("[data-desc-wrap]");
+      wrap.classList.toggle("hidden", !e.target.checked);
+      if (e.target.checked) wrap.querySelector("textarea").focus();
+      updateTabIndicators();
+    });
+    row.querySelector("[data-field-desc]").addEventListener("input", (e) => {
+      field.description = e.target.value;
+      updateTabIndicators();
+    });
     row.querySelector("[data-field-options]").addEventListener("input", (e) => {
       field.options = e.target.value;
       updateTabIndicators();
@@ -531,6 +711,8 @@ function addFormField() {
     field_type: "text",
     options: "",
     is_required: false,
+    description: "",
+    show_description: false,
   });
   renderFormFieldsList();
   const inputs = document.querySelectorAll("#form-fields-list [data-field-label]");
@@ -564,8 +746,19 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("action-modal-cancel").addEventListener("click", closeActionModal);
   document.getElementById("action-modal-ok").addEventListener("click", handleActionConfirm);
 
+  document.getElementById("event-image-file").addEventListener("change", handleEventImageSelected);
+  document.getElementById("event-image-recrop").addEventListener("click", openEventCropper);
+  document.getElementById("event-image-remove").addEventListener("click", removeEventImage);
+  document.getElementById("event-crop-cancel").addEventListener("click", closeEventCropper);
+  document.getElementById("event-crop-apply").addEventListener("click", applyEventCrop);
+  document.getElementById("event-crop-zoom").addEventListener("input", handleEventZoom);
+  document.querySelectorAll("[data-ecrop]").forEach((b) => b.addEventListener("click", () => handleEventCropControl(b.dataset.ecrop)));
+  document.querySelectorAll(".ratio-btn").forEach((b) => b.addEventListener("click", () => handleEventRatio(b.dataset.ratio)));
+
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
+    // Tutup lapisan paling atas dulu (crop berada di atas pop up event)
+    if (!document.getElementById("event-crop-modal").classList.contains("hidden")) return closeEventCropper();
     closeActionModal();
     closeModal();
   });

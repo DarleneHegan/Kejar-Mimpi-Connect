@@ -8,7 +8,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="icon" type="image/jpeg" href="/images/logo-kejar-mimpi.jpg" />
-  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" />
+  <link rel="stylesheet" href="/css/styles.css?v=20261002-2" />
 </head>
 <body class="bg-gray-50 min-h-screen">
 
@@ -135,8 +136,24 @@
               <input type="text" id="location" placeholder="misal: Aula Gedung A / Zoom Meeting" class="admin-input" />
             </div>
             <div>
-              <label for="image_url" class="admin-label">URL Gambar Event</label>
-              <input type="url" id="image_url" placeholder="https://..." class="admin-input" />
+              <p class="admin-label">Gambar Event</p>
+              <div id="event-image-preview" class="relative w-full aspect-[16/9] rounded-xl overflow-hidden border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center">
+                <div id="event-image-empty" class="text-center px-4">
+                  <svg class="w-8 h-8 text-gray-300 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  <p class="text-sm text-gray-500">Belum ada gambar</p>
+                </div>
+                <img id="event-image-img" alt="Preview gambar event" class="hidden w-full h-full object-cover" />
+              </div>
+              <div class="flex flex-wrap gap-2 mt-2">
+                <label for="event-image-file" class="admin-btn-ghost cursor-pointer inline-flex items-center gap-1.5">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                  <span id="event-image-btn-text">Upload Gambar</span>
+                </label>
+                <input type="file" id="event-image-file" accept="image/jpeg,image/png,image/webp" class="sr-only" />
+                <button type="button" id="event-image-recrop" class="hidden admin-btn-ghost">Atur Ukuran</button>
+                <button type="button" id="event-image-remove" class="hidden text-xs font-semibold px-3 py-2 rounded-xl text-[#C8102E] hover:bg-red-50">Hapus Gambar</button>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">JPG, PNG, atau WEBP, maks 10 MB. Setelah dipilih kamu bisa atur area dan ukuran gambarnya.</p>
             </div>
             <div>
               <label for="description" class="admin-label">Deskripsi</label>
@@ -174,6 +191,41 @@
     </div>
   </div>
 
+  <!-- Modal atur ukuran / crop gambar event -->
+  <div id="event-crop-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center px-4 admin-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="event-crop-title">
+    <div class="admin-modal max-w-2xl max-h-[95vh] flex flex-col overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100">
+        <h2 id="event-crop-title" class="font-bold text-gray-800 text-lg">Atur Ukuran Gambar</h2>
+        <p class="text-xs text-gray-500 mt-0.5">Pilih rasio, lalu geser dan tarik sudut kotak atau zoom gambar. Area di dalam kotak yang dipakai.</p>
+      </div>
+      <div class="p-4 bg-gray-900">
+        <div class="event-crop-stage"><img id="event-crop-image" alt="Gambar yang akan diatur" /></div>
+      </div>
+      <div class="px-6 py-4 space-y-3 border-t border-gray-100">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs font-semibold text-gray-600 w-12">Rasio</span>
+          <button type="button" data-ratio="1.7778" class="ratio-btn admin-btn-ghost">16:9 (disarankan)</button>
+          <button type="button" data-ratio="1.3333" class="ratio-btn admin-btn-ghost">4:3</button>
+          <button type="button" data-ratio="1" class="ratio-btn admin-btn-ghost">1:1</button>
+          <button type="button" data-ratio="0" class="ratio-btn admin-btn-ghost">Bebas</button>
+        </div>
+        <div class="flex items-center gap-3">
+          <label for="event-crop-zoom" class="text-xs font-semibold text-gray-600 w-12">Zoom</label>
+          <input type="range" id="event-crop-zoom" min="0" max="100" value="0" class="flex-1 accent-[#C8102E]" />
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" data-ecrop="rotate-left" class="admin-btn-ghost">↺ Putar Kiri</button>
+          <button type="button" data-ecrop="rotate-right" class="admin-btn-ghost">↻ Putar Kanan</button>
+          <button type="button" data-ecrop="reset" class="admin-btn-ghost">Reset</button>
+        </div>
+      </div>
+      <div class="flex gap-3 px-6 py-4 border-t border-gray-100">
+        <button type="button" id="event-crop-cancel" class="flex-1 admin-btn-secondary">Batal</button>
+        <button type="button" id="event-crop-apply" class="flex-1 admin-btn-primary">Gunakan Gambar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal konfirmasi aksi event (publikasi / tutup / hapus) -->
   <div id="action-modal" class="hidden fixed inset-0 admin-modal-backdrop z-50 flex items-center justify-center px-4" role="dialog" aria-modal="true" aria-labelledby="action-modal-title">
     <div class="admin-modal max-w-sm p-6">
@@ -187,9 +239,10 @@
     </div>
   </div>
 
-  <script src="/js/config.js"></script>
-  <script src="/js/api.js"></script>
-  <script src="/js/components.js"></script>
-  <script src="/js/pages/admin-dashboard.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+  <script src="/js/config.js?v=20261002-2"></script>
+  <script src="/js/api.js?v=20261002-2"></script>
+  <script src="/js/components.js?v=20261002-2"></script>
+  <script src="/js/pages/admin-dashboard.js?v=20261002-2"></script>
 </body>
 </html>

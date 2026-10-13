@@ -8,9 +8,23 @@ function getEventIdFromUrl() {
   return params.get("id");
 }
 
+function escapeHtmlField(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function renderCustomFieldInput(field) {
   const req = field.is_required ? "required" : "";
-  const label = `<label class="block text-sm font-medium text-gray-700 mb-1">${field.label}${field.is_required ? " *" : ""}</label>`;
+  // Deskripsi hanya ditampilkan jika admin mengaktifkannya untuk pertanyaan ini.
+  const descHtml = field.show_description && field.description
+    ? `<p id="desc-${field.id}" class="text-xs text-gray-500 -mt-0.5 mb-2 whitespace-pre-line leading-relaxed">${escapeHtmlField(field.description)}</p>`
+    : "";
+  const star = field.is_required ? ` <span class="text-[#C8102E]" aria-hidden="true">*</span>` : "";
+  const label = `<label class="block text-sm font-medium text-gray-700 mb-1">${escapeHtmlField(field.label)}${star}</label>${descHtml}`;
   const baseInputClass = "w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C8102E]/40 focus:border-[#C8102E]";
 
   if (field.field_type === "textarea") {

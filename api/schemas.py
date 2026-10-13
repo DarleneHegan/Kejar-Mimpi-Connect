@@ -44,11 +44,16 @@ class AdminOut(BaseModel):
 
 
 # ---------- Event ----------
+# Gambar event: hasil upload + crop di browser (data URL, maks ~2 MB),
+# atau URL http(s) lama agar event yang sudah ada tetap valid.
+EVENT_IMAGE_MAX = 2_800_000
+EVENT_IMAGE_PATTERN = r"^(data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+|https?://\S+)$"
+
 class EventBase(BaseModel):
     title: str = Field(..., min_length=3, max_length=200)
     description: Optional[str] = None
     location: Optional[str] = None
-    image_url: Optional[str] = None
+    image_url: Optional[str] = Field(default=None, max_length=EVENT_IMAGE_MAX, pattern=EVENT_IMAGE_PATTERN)
     category: Optional[str] = None
     start_time: datetime
     end_time: Optional[datetime] = None
@@ -66,7 +71,7 @@ class EventUpdate(BaseModel):
     title: Optional[str] = Field(default=None, min_length=3, max_length=200)
     description: Optional[str] = None
     location: Optional[str] = None
-    image_url: Optional[str] = None
+    image_url: Optional[str] = Field(default=None, max_length=EVENT_IMAGE_MAX, pattern=EVENT_IMAGE_PATTERN)
     category: Optional[str] = None
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
@@ -96,6 +101,8 @@ class EventFormFieldBase(BaseModel):
     field_type: str = Field(default="text")
     options: Optional[List[str]] = None
     is_required: bool = False
+    description: Optional[str] = Field(default=None, max_length=1000)
+    show_description: bool = False
     order: int = 0
 
     def validate_type(self):
