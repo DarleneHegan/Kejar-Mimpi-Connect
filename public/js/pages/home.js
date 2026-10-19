@@ -4,51 +4,88 @@ let allEvents = [];
 let activeCategory = "";
 let searchTimeout = null;
 
-const CATEGORY_COLORS = {
-  Workshop: "bg-blue-100 text-blue-700",
-  Seminar: "bg-purple-100 text-purple-700",
-  Webinar: "bg-teal-100 text-teal-700",
-  Lomba: "bg-amber-100 text-amber-700",
-  Sosial: "bg-green-100 text-green-700",
-};
+// Palet warna kategori (badge di kartu + titik di chip filter). Kategori lain dapat warna otomatis.
+const CATEGORY_PALETTE = [
+  { badge: "bg-rose-100 text-rose-700", dot: "#e11d48" },
+  { badge: "bg-amber-100 text-amber-700", dot: "#d97706" },
+  { badge: "bg-sky-100 text-sky-700", dot: "#0284c7" },
+  { badge: "bg-violet-100 text-violet-700", dot: "#7c3aed" },
+  { badge: "bg-emerald-100 text-emerald-700", dot: "#059669" },
+  { badge: "bg-orange-100 text-orange-700", dot: "#ea580c" },
+];
+const CATEGORY_FIXED = { Workshop: 0, Seminar: 3, Webinar: 2, Lomba: 1, Sosial: 4 };
 
-function categoryBadgeClass(category) {
-  return CATEGORY_COLORS[category] || "bg-gray-100 text-gray-700";
+function categoryStyle(category) {
+  if (category in CATEGORY_FIXED) return CATEGORY_PALETTE[CATEGORY_FIXED[category]];
+  let hash = 0;
+  for (const ch of String(category)) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+  return CATEGORY_PALETTE[hash % CATEGORY_PALETTE.length];
 }
 
-function renderEventCard(event) {
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function isRegistrationOpen(event) {
+  const isFull = event.quota && event.registered_count >= event.quota;
+  const isPast = new Date(event.start_time) < new Date();
+  return !event.is_closed && !isFull && !isPast;
+}
+
+function renderEventCard(event, index) {
   const isFull = event.quota && event.registered_count >= event.quota;
   const spotsLeft = event.quota ? Math.max(event.quota - event.registered_count, 0) : null;
+  const date = new Date(event.start_time);
+  const day = date.toLocaleDateString("id-ID", { day: "2-digit" });
+  const month = date.toLocaleDateString("id-ID", { month: "short" });
+  const pct = event.quota ? Math.min(100, Math.round((event.registered_count / event.quota) * 100)) : 0;
+  const barClass = pct >= 100 ? "is-full" : pct >= 75 ? "is-warn" : "";
+  const title = escapeHtml(event.title);
+
+  const statusText = event.is_closed
+    ? "Pendaftaran ditutup"
+    : event.quota ? (isFull ? "Kuota penuh" : `${spotsLeft} slot tersisa`) : "Slot tidak terbatas";
+  const statusColor = isFull || event.is_closed ? "text-gray-400" : "text-emerald-600";
 
   return `
-  <a href="/event-detail.html?id=${event.id}" class="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col">
-    <div class="relative h-44 bg-gray-100 overflow-hidden">
+  <a href="/event-detail.html?id=${encodeURIComponent(event.id)}" class="event-card group reveal" style="--reveal-delay:${(index % 3) * 80}ms">
+    <div class="event-card-media">
       ${event.image_url
-        ? `<img src="${event.image_url}" alt="${event.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null;this.src='https://placehold.co/400x240/C8102E/ffffff?text=Event';" />`
-        : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#C8102E] to-[#8a0b20] text-white text-2xl font-bold">${event.title.charAt(0)}</div>`
+        ? `<img src="${escapeHtml(event.image_url)}" alt="${title}" loading="lazy" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/400x240/C8102E/ffffff?text=Event';" />`
+        : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#C8102E] via-[#e8384f] to-[#8a0b20] text-white text-4xl font-extrabold">${escapeHtml(event.title.charAt(0))}</div>`
       }
-      ${event.category ? `<span class="absolute top-3 left-3 text-xs font-semibold px-2.5 py-1 rounded-full ${categoryBadgeClass(event.category)}">${event.category}</span>` : ""}
+      ${event.category ? `<span class="absolute top-3 left-3 z-[1] text-xs font-bold px-2.5 py-1 rounded-full ${categoryStyle(event.category).badge}">${escapeHtml(event.category)}</span>` : ""}
       ${event.is_closed
-        ? `<span class="absolute top-3 right-3 text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-800 text-white">Pendaftaran Ditutup</span>`
-        : isFull ? `<span class="absolute top-3 right-3 text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-800 text-white">Kuota Penuh</span>` : ""}
+        ? `<span class="absolute top-3 right-3 z-[1] text-xs font-bold px-2.5 py-1 rounded-full bg-gray-900/80 text-white backdrop-blur">Pendaftaran Ditutup</span>`
+        : isFull ? `<span class="absolute top-3 right-3 z-[1] text-xs font-bold px-2.5 py-1 rounded-full bg-gray-900/80 text-white backdrop-blur">Kuota Penuh</span>` : ""}
+      <span class="date-badge"><span class="date-badge-day">${day}</span><span class="date-badge-month">${month}</span></span>
     </div>
     <div class="p-5 flex flex-col flex-1">
-      <h3 class="font-bold text-gray-800 mb-2 line-clamp-2 group-hover:text-[#C8102E] transition-colors">${event.title}</h3>
-      <div class="text-sm text-gray-500 flex items-center gap-1.5 mb-1.5">
-        <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-        <span>${formatDateOnly(event.start_time)}</span>
-      </div>
-      ${event.location ? `
-      <div class="text-sm text-gray-500 flex items-center gap-1.5 mb-3">
-        <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-        <span class="line-clamp-1">${event.location}</span>
-      </div>` : '<div class="mb-3"></div>'}
-      <p class="text-sm text-gray-500 line-clamp-2 mb-4 flex-1">${event.description || ""}</p>
-      <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-        <span class="text-xs font-medium ${isFull || event.is_closed ? 'text-gray-400' : 'text-green-600'}">
-          ${event.is_closed ? 'Pendaftaran ditutup' : event.quota ? (isFull ? 'Kuota penuh' : `${spotsLeft} slot tersisa`) : 'Slot tidak terbatas'}
+      <h3 class="font-bold text-gray-800 text-lg leading-snug mb-2 line-clamp-2 group-hover:text-[#C8102E] transition-colors">${title}</h3>
+      <div class="flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-gray-500 mb-3">
+        <span class="inline-flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-[#C8102E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          ${formatDateOnly(event.start_time)}
         </span>
-        <span class="text-sm font-semibold text-[#C8102E] group-hover:underline">Lihat Detail &rarr;</span>
+        ${event.location ? `
+        <span class="inline-flex items-center gap-1.5 min-w-0">
+          <svg class="w-4 h-4 text-[#C8102E] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+          <span class="line-clamp-1">${escapeHtml(event.location)}</span>
+        </span>` : ""}
+      </div>
+      <p class="text-sm text-gray-500 line-clamp-2 mb-4 flex-1">${escapeHtml(event.description || "")}</p>
+      ${event.quota ? `<div class="quota-bar mb-3" aria-hidden="true"><span class="${barClass}" style="width:${pct}%"></span></div>` : ""}
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-semibold ${statusColor}">${statusText}</span>
+        <span class="event-card-arrow" aria-hidden="true">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+        </span>
+        <span class="sr-only">Lihat Detail</span>
       </div>
     </div>
   </a>`;
@@ -63,21 +100,30 @@ function renderCategoryFilters() {
     .map((cat) => {
       const isActive = (cat === "Semua" && !activeCategory) || cat === activeCategory;
       const value = cat === "Semua" ? "" : cat;
-      return `<button data-category="${value}" class="category-chip px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
-        isActive
-          ? "bg-[#C8102E] text-white border-[#C8102E]"
-          : "bg-white text-gray-600 border-gray-200 hover:border-[#C8102E] hover:text-[#C8102E]"
-      }">${cat}</button>`;
+      const count = cat === "Semua" ? allEvents.length : allEvents.filter((e) => e.category === cat).length;
+      const dot = cat === "Semua"
+        ? ""
+        : `<span class="cat-chip-dot" style="background:${isActive ? "#fff" : categoryStyle(cat).dot}"></span>`;
+      return `<button type="button" data-category="${escapeHtml(value)}" aria-pressed="${isActive}" class="cat-chip ${isActive ? "is-active" : ""}">
+        ${dot}${escapeHtml(cat)}<span class="text-xs ${isActive ? "text-white/80" : "text-gray-400"}">${count}</span>
+      </button>`;
     })
     .join("");
 
-  container.querySelectorAll(".category-chip").forEach((btn) => {
+  container.querySelectorAll(".cat-chip").forEach((btn) => {
     btn.addEventListener("click", () => {
       activeCategory = btn.dataset.category;
       renderCategoryFilters();
       applyFilters();
     });
   });
+}
+
+function renderStats() {
+  const categories = new Set(allEvents.map((e) => e.category).filter(Boolean));
+  document.getElementById("stat-events").textContent = allEvents.length;
+  document.getElementById("stat-open").textContent = allEvents.filter(isRegistrationOpen).length;
+  document.getElementById("stat-categories").textContent = categories.size;
 }
 
 function applyFilters() {
@@ -111,6 +157,7 @@ function renderEventGrid(events) {
   emptyState.classList.add("hidden");
   emptyState.classList.remove("flex");
   grid.innerHTML = events.map(renderEventCard).join("");
+  observeReveal(grid);
 }
 
 async function loadEvents() {
@@ -125,6 +172,7 @@ async function loadEvents() {
   } finally {
     loadingState.classList.add("hidden");
   }
+  renderStats();
   renderCategoryFilters();
   applyFilters();
 }

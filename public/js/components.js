@@ -1,29 +1,33 @@
 // Komponen navbar & footer yang dipakai berulang di semua halaman publik.
 
 function renderPublicNavbar(activePage = "") {
+  const link = (href, label, key) =>
+    `<a href="${href}" class="nav-link ${activePage === key ? "is-active" : ""}"${activePage === key ? ' aria-current="page"' : ""}>${label}</a>`;
+  const mobileLink = (href, label, key) =>
+    `<a href="${href}" class="px-3 py-2.5 rounded-xl text-sm font-semibold ${activePage === key ? "bg-red-50 text-[#C8102E]" : "text-gray-700 hover:bg-gray-50"}">${label}</a>`;
   return `
-  <nav class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+  <nav id="site-nav" class="site-nav border-b border-gray-100 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
-        <a href="/index.html" class="flex items-center gap-2">
-          <img src="/images/logo-kejar-mimpi.jpg" alt="Kejar Mimpi Jakarta" class="w-9 h-9 rounded-lg object-cover" />
-          <span class="font-bold text-lg text-gray-800">Kejar <span class="text-[#C8102E]">Mimpi</span> <span class="text-gray-500 font-semibold">Jakarta</span></span>
+        <a href="/index.html" class="flex items-center gap-2.5 group">
+          <img src="/images/logo-kejar-mimpi.jpg" alt="Kejar Mimpi Jakarta" class="w-9 h-9 rounded-xl object-cover shadow-sm ring-2 ring-red-100 group-hover:ring-[#C8102E]/40 transition" />
+          <span class="font-extrabold text-lg text-gray-800 tracking-tight">Kejar <span class="text-[#C8102E]">Mimpi</span> <span class="text-gray-400 font-semibold">Jakarta</span></span>
         </a>
-        <div class="hidden md:flex items-center gap-8">
-          <a href="/index.html" class="text-sm font-medium ${activePage === "home" ? "text-[#C8102E]" : "text-gray-600 hover:text-[#C8102E]"} transition-colors">Event</a>
-          <a href="/about.html" class="text-sm font-medium ${activePage === "about" ? "text-[#C8102E]" : "text-gray-600 hover:text-[#C8102E]"} transition-colors">About</a>
-          <a href="/admin-login.html" class="text-sm font-medium text-gray-600 hover:text-[#C8102E] transition-colors">Login Admin</a>
+        <div class="hidden md:flex items-center gap-7">
+          ${link("/index.html", "Event", "home")}
+          ${link("/about.html", "About", "about")}
+          <a href="/admin-login.html" class="nav-cta">Login Admin</a>
         </div>
-        <button id="mobile-menu-btn" class="md:hidden p-2 text-gray-600">
+        <button id="mobile-menu-btn" class="md:hidden p-2 rounded-xl text-gray-600 hover:bg-gray-100" aria-label="Buka menu" aria-expanded="false" aria-controls="mobile-menu">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
       </div>
-      <div id="mobile-menu" class="hidden md:hidden pb-4 flex flex-col gap-3">
-        <a href="/index.html" class="text-sm font-medium text-gray-600">Eventa</a>
-        <a href="/about.html" class="text-sm font-medium text-gray-600">About</a>
-        <a href="/admin-login.html" class="text-sm font-medium text-gray-600">Login Admin</a>
+      <div id="mobile-menu" class="hidden md:hidden pb-4 flex flex-col gap-1">
+        ${mobileLink("/index.html", "Event", "home")}
+        ${mobileLink("/about.html", "About", "about")}
+        <a href="/admin-login.html" class="nav-cta text-center mt-2">Login Admin</a>
       </div>
     </div>
   </nav>`;
@@ -31,17 +35,61 @@ function renderPublicNavbar(activePage = "") {
 
 function renderFooter() {
   return `
-  <footer class="bg-[#1a1a1a] text-gray-300 mt-16">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-        <div class="flex items-center gap-2">
-          <img src="/images/logo-kejar-mimpi.jpg" alt="Kejar Mimpi Jakarta" class="w-8 h-8 rounded-lg object-cover" />
-          <span class="font-semibold text-white">Komunitas Kejar Mimpi Jakarta</span>
+  <footer class="site-footer text-gray-300 mt-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid md:grid-cols-3 gap-8 items-start">
+        <div>
+          <div class="flex items-center gap-2.5 mb-3">
+            <img src="/images/logo-kejar-mimpi.jpg" alt="Kejar Mimpi Jakarta" class="w-10 h-10 rounded-xl object-cover" />
+            <span class="font-extrabold text-white text-lg">Kejar Mimpi Jakarta</span>
+          </div>
+          <p class="text-sm text-gray-400 max-w-xs">Komunitas anak muda Jakarta untuk belajar, terhubung, dan berdampak bersama.</p>
         </div>
-        <p class="text-sm text-gray-400">&copy; ${new Date().getFullYear()} Kejar Mimpi Jakarta. Semua hak cipta dilindungi.</p>
+        <div>
+          <p class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">Jelajahi</p>
+          <div class="flex flex-col gap-2 text-sm">
+            <a href="/index.html" class="hover:text-white transition-colors">Semua Event</a>
+            <a href="/about.html" class="hover:text-white transition-colors">Tentang Komunitas</a>
+            <a href="/about.html#organizers" class="hover:text-white transition-colors">Tim Organizer</a>
+          </div>
+        </div>
+        <div class="md:text-right">
+          <p class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">Ikut Bergerak</p>
+          <a href="/index.html" class="inline-flex items-center gap-2 text-sm font-semibold text-white bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl transition-colors">
+            Cari event untukmu
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+          </a>
+        </div>
+      </div>
+      <div class="border-t border-white/10 mt-10 pt-6 text-sm text-gray-500 text-center md:text-left">
+        &copy; ${new Date().getFullYear()} Kejar Mimpi Jakarta. Semua hak cipta dilindungi.
       </div>
     </div>
   </footer>`;
+}
+
+// Animasi muncul saat elemen masuk layar. Bisa dipanggil ulang setelah render dinamis.
+let revealObserver = null;
+function observeReveal(root = document) {
+  const items = root.querySelectorAll(".reveal:not(.is-visible)");
+  if (!("IntersectionObserver" in window)) {
+    items.forEach((el) => el.classList.add("is-visible"));
+    return;
+  }
+  if (!revealObserver) {
+    revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+    );
+  }
+  items.forEach((el) => revealObserver.observe(el));
 }
 
 function mountLayout({ activePage = "" } = {}) {
@@ -53,8 +101,22 @@ function mountLayout({ activePage = "" } = {}) {
   const menuBtn = document.getElementById("mobile-menu-btn");
   const menu = document.getElementById("mobile-menu");
   if (menuBtn && menu) {
-    menuBtn.addEventListener("click", () => menu.classList.toggle("hidden"));
+    menuBtn.addEventListener("click", () => {
+      const open = menu.classList.toggle("hidden") === false;
+      menuBtn.setAttribute("aria-expanded", String(open));
+    });
   }
+
+  // Bayangan navbar saat halaman di-scroll
+  const nav = document.getElementById("site-nav");
+  if (nav) {
+    const onScroll = () => nav.classList.toggle("is-scrolled", window.scrollY > 8);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  }
+
+  document.documentElement.classList.add("js-reveal");
+  observeReveal();
 }
 
 function showToast(message, type = "success") {

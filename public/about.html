@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="icon" type="image/jpeg" href="/images/logo-kejar-mimpi.jpg" />
-  <link rel="stylesheet" href="/css/styles.css?v=20261002-2" />
+  <link rel="stylesheet" href="/css/styles.css?v=20261002-4" />
 </head>
 <body class="bg-white min-h-screen flex flex-col">
 
@@ -24,33 +24,52 @@
           <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest bg-white/15 rounded-full px-4 py-1.5 mb-6">
             <span class="w-1.5 h-1.5 rounded-full bg-white"></span> Komunitas Kejar Mimpi Jakarta
           </span>
-          <h1 class="text-4xl md:text-5xl font-extrabold leading-tight mb-5">
+          <h1 class="text-4xl md:text-5xl font-extrabold leading-tight mb-5 reveal" style="--reveal-delay:80ms">
             Bersama mewujudkan<br /><span class="text-white/80">mimpi anak muda Jakarta.</span>
           </h1>
-          <p class="text-white/85 text-lg leading-relaxed max-w-xl mb-8">
+          <p class="text-white/85 text-lg leading-relaxed max-w-xl mb-8 reveal" style="--reveal-delay:160ms">
             Kejar Mimpi Jakarta adalah komunitas anak muda di Jakarta yang bergerak bersama program Kejar Mimpi
             dari CIMB Niaga. Kami membuka ruang belajar, memperluas jejaring, dan menciptakan kesempatan untuk
             berdampak bagi lingkungan sekitar.
           </p>
-          <div class="flex flex-wrap gap-3">
+          <div class="flex flex-wrap gap-3 reveal" style="--reveal-delay:240ms">
             <a href="/index.html" class="bg-white text-[#C8102E] font-bold px-6 py-3 rounded-xl shadow-lg hover:-translate-y-0.5 transition-transform">Lihat Event</a>
             <a href="#organizers" class="border border-white/40 hover:bg-white/10 font-semibold px-6 py-3 rounded-xl transition-colors">Kenali Tim Kami</a>
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-2 gap-4 reveal" style="--reveal-delay:200ms">
           <div class="about-stat"><p class="text-3xl font-extrabold">Belajar</p><p class="text-sm text-white/70 mt-1">Workshop, seminar, dan sesi berbagi bersama praktisi.</p></div>
           <div class="about-stat translate-y-6"><p class="text-3xl font-extrabold">Terhubung</p><p class="text-sm text-white/70 mt-1">Jejaring dengan sesama anak muda dan para mentor.</p></div>
           <div class="about-stat"><p class="text-3xl font-extrabold">Berkarya</p><p class="text-sm text-white/70 mt-1">Ruang untuk mencoba, membuat, dan menunjukkan karya.</p></div>
           <div class="about-stat translate-y-6"><p class="text-3xl font-extrabold">Berdampak</p><p class="text-sm text-white/70 mt-1">Kegiatan sosial untuk komunitas di sekitar kita.</p></div>
         </div>
       </div>
+      <div class="wave-divider" aria-hidden="true">
+        <svg viewBox="0 0 1440 48" preserveAspectRatio="none"><path fill="#ffffff" d="M0,30 C300,60 600,4 900,22 C1140,36 1300,46 1440,28 L1440,48 L0,48 Z" /></svg>
+      </div>
     </section>
 
     <!-- ================= TENTANG ================= -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 grid lg:grid-cols-5 gap-12 items-start">
       <div class="lg:col-span-2">
-        <p class="about-eyebrow">Tentang Kami</p>
-        <h2 class="about-title">Dari sebuah gerakan, menjadi komunitas.</h2>
+        <p class="about-eyebrow reveal">Tentang Kami</p>
+        <h2 class="about-title reveal" style="--reveal-delay:80ms">Dari sebuah gerakan, menjadi komunitas.</h2>
+
+        <figure class="community-figure reveal" style="--reveal-delay:160ms">
+          <span class="community-glow" aria-hidden="true"></span>
+          <span class="community-ring" aria-hidden="true"></span>
+          <span class="community-dots" aria-hidden="true"></span>
+          <picture>
+            <source srcset="/images/community.webp" type="image/webp" />
+            <img src="/images/community.png" alt="Anak muda Komunitas Kejar Mimpi Jakarta berjalan bersama sambil tertawa" width="890" height="900" loading="lazy" class="community-img" />
+          </picture>
+          <figcaption class="community-badge">
+            <span class="community-badge-icon" aria-hidden="true">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            </span>
+            <span><strong class="block text-gray-800 text-sm leading-tight">Tumbuh bersama</strong><span class="text-xs text-gray-500">Anak muda Jakarta</span></span>
+          </figcaption>
+        </figure>
       </div>
       <div class="lg:col-span-3 space-y-5 text-gray-600 leading-relaxed">
         <p>
@@ -64,9 +83,9 @@
           dan sekitarnya.
         </p>
         <div class="grid sm:grid-cols-3 gap-4 pt-4">
-          <div class="about-value"><span class="about-value-dot"></span><p class="font-semibold text-gray-800">Inklusif</p><p class="text-sm">Terbuka untuk siapa saja yang ingin bertumbuh.</p></div>
-          <div class="about-value"><span class="about-value-dot"></span><p class="font-semibold text-gray-800">Kolaboratif</p><p class="text-sm">Bergerak bersama partner dan komunitas lain.</p></div>
-          <div class="about-value"><span class="about-value-dot"></span><p class="font-semibold text-gray-800">Berkelanjutan</p><p class="text-sm">Program yang memberi manfaat jangka panjang.</p></div>
+          <div class="about-value reveal" style="--reveal-delay:0ms"><span class="about-value-dot"></span><p class="font-semibold text-gray-800">Inklusif</p><p class="text-sm">Terbuka untuk siapa saja yang ingin bertumbuh.</p></div>
+          <div class="about-value reveal" style="--reveal-delay:90ms"><span class="about-value-dot"></span><p class="font-semibold text-gray-800">Kolaboratif</p><p class="text-sm">Bergerak bersama partner dan komunitas lain.</p></div>
+          <div class="about-value reveal" style="--reveal-delay:180ms"><span class="about-value-dot"></span><p class="font-semibold text-gray-800">Berkelanjutan</p><p class="text-sm">Program yang memberi manfaat jangka panjang.</p></div>
         </div>
       </div>
     </section>
@@ -75,37 +94,37 @@
     <section class="bg-gray-50 border-y border-gray-100">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div class="max-w-2xl mb-12">
-          <p class="about-eyebrow">Struktur Komunitas</p>
-          <h2 class="about-title">Peran di balik setiap kegiatan</h2>
+          <p class="about-eyebrow reveal">Struktur Komunitas</p>
+          <h2 class="about-title reveal" style="--reveal-delay:80ms">Peran di balik setiap kegiatan</h2>
           <p class="text-gray-500 mt-3">Komunitas kami terbagi ke dalam beberapa divisi yang saling melengkapi.</p>
         </div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          <div class="division-card">
+          <div class="division-card reveal" style="--accent:#C8102E;--accent-soft:#ffe5e9;--reveal-delay:0ms">
             <div class="division-icon"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg></div>
             <h3 class="font-bold text-gray-800 text-lg">Leader</h3>
             <p class="text-sm text-gray-500 mt-1.5">Mengarahkan komunitas dan seluruh divisi agar program tetap sejalan dengan tujuan, sekaligus mewakili komunitas di luar.</p>
           </div>
-          <div class="division-card">
+          <div class="division-card reveal" style="--accent:#ea580c;--accent-soft:#ffedd5;--reveal-delay:80ms">
             <div class="division-icon"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></div>
             <h3 class="font-bold text-gray-800 text-lg">Event & Program</h3>
             <p class="text-sm text-gray-500 mt-1.5">Merancang, menjalankan, dan mengevaluasi setiap program serta event komunitas.</p>
           </div>
-          <div class="division-card">
+          <div class="division-card reveal" style="--accent:#db2777;--accent-soft:#fce7f3;--reveal-delay:160ms">
             <div class="division-icon"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg></div>
             <h3 class="font-bold text-gray-800 text-lg">Partnership / Sponsorship</h3>
             <p class="text-sm text-gray-500 mt-1.5">Menjalin dan merawat kerja sama dengan partner, sponsor, dan kolaborator eksternal.</p>
           </div>
-          <div class="division-card">
+          <div class="division-card reveal" style="--accent:#7c3aed;--accent-soft:#ede9fe;--reveal-delay:0ms">
             <div class="division-icon"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg></div>
             <h3 class="font-bold text-gray-800 text-lg">Creative / Design</h3>
             <p class="text-sm text-gray-500 mt-1.5">Menyiapkan kebutuhan visual dan menjaga setiap materi kreatif tetap sesuai identitas brand.</p>
           </div>
-          <div class="division-card">
+          <div class="division-card reveal" style="--accent:#0284c7;--accent-soft:#e0f2fe;--reveal-delay:80ms">
             <div class="division-icon"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg></div>
             <h3 class="font-bold text-gray-800 text-lg">Social Media</h3>
             <p class="text-sm text-gray-500 mt-1.5">Merencanakan konten, mengunggah, dan membangun interaksi di media sosial komunitas.</p>
           </div>
-          <div class="division-card">
+          <div class="division-card reveal" style="--accent:#d97706;--accent-soft:#fef3c7;--reveal-delay:160ms">
             <div class="division-icon"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" /></svg></div>
             <h3 class="font-bold text-gray-800 text-lg">Media Relations</h3>
             <p class="text-sm text-gray-500 mt-1.5">Menjaga hubungan dengan media dan menyebarkan publikasi agar kegiatan dikenal lebih luas.</p>
@@ -117,8 +136,8 @@
     <!-- ================= ORGANIZERS ================= -->
     <section id="organizers" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 scroll-mt-20">
       <div class="text-center max-w-2xl mx-auto mb-14">
-        <p class="about-eyebrow">Tim Kami</p>
-        <h2 class="about-title">Organizers</h2>
+        <p class="about-eyebrow reveal">Tim Kami</p>
+        <h2 class="about-title reveal" style="--reveal-delay:80ms">Organizers</h2>
         <p class="text-gray-500 mt-3">Orang-orang yang menggerakkan Komunitas Kejar Mimpi Jakarta.</p>
       </div>
       <div id="organizers-loading" class="flex justify-center py-10"><div class="spinner"></div></div>
@@ -132,33 +151,33 @@
         <div>
           <div class="flex items-end justify-between flex-wrap gap-2 mb-6">
             <div>
-              <p class="about-eyebrow">Kolaborasi</p>
+              <p class="about-eyebrow reveal">Kolaborasi</p>
               <h2 class="text-2xl font-extrabold text-gray-800">Local Partners</h2>
             </div>
             <p class="text-sm text-gray-500">Mitra lokal yang mendukung kegiatan komunitas.</p>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            <div class="partner-tile">Partner 1</div>
-            <div class="partner-tile">Partner 2</div>
-            <div class="partner-tile">Partner 3</div>
-            <div class="partner-tile">Partner 4</div>
-            <div class="partner-tile">Partner 5</div>
+            <div class="partner-tile reveal">Partner 1</div>
+            <div class="partner-tile reveal">Partner 2</div>
+            <div class="partner-tile reveal">Partner 3</div>
+            <div class="partner-tile reveal">Partner 4</div>
+            <div class="partner-tile reveal">Partner 5</div>
           </div>
         </div>
         <div>
           <div class="flex items-end justify-between flex-wrap gap-2 mb-6">
             <div>
-              <p class="about-eyebrow">Publikasi</p>
+              <p class="about-eyebrow reveal">Publikasi</p>
               <h2 class="text-2xl font-extrabold text-gray-800">Media Partners</h2>
             </div>
             <p class="text-sm text-gray-500">Media yang membantu menyebarkan kegiatan kami.</p>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            <div class="partner-tile">Media 1</div>
-            <div class="partner-tile">Media 2</div>
-            <div class="partner-tile">Media 3</div>
-            <div class="partner-tile">Media 4</div>
-            <div class="partner-tile">Media 5</div>
+            <div class="partner-tile reveal">Media 1</div>
+            <div class="partner-tile reveal">Media 2</div>
+            <div class="partner-tile reveal">Media 3</div>
+            <div class="partner-tile reveal">Media 4</div>
+            <div class="partner-tile reveal">Media 5</div>
           </div>
         </div>
       </div>
@@ -175,17 +194,17 @@
             <p class="text-white/70">Ingin bergabung, menjadi partner, atau punya pertanyaan seputar kegiatan? Hubungi kami.</p>
           </div>
           <div class="lg:col-span-3 grid sm:grid-cols-3 gap-4">
-            <a href="mailto:kejarmimpi@example.com" class="contact-card">
+            <a href="mailto:kejarmimpi@example.com" class="contact-card reveal">
               <svg class="w-6 h-6 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
               <span class="text-xs text-white/50 mt-3">Email</span>
               <span class="font-semibold break-all">kejarmimpi@example.com</span>
             </a>
-            <a href="https://linktr.ee/kejarmimpi.id" target="_blank" rel="noopener noreferrer" class="contact-card">
+            <a href="https://linktr.ee/kejarmimpi.id" target="_blank" rel="noopener noreferrer" class="contact-card reveal">
               <svg class="w-6 h-6 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="5" stroke-width="2" /><circle cx="12" cy="12" r="4" stroke-width="2" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" /></svg>
               <span class="text-xs text-white/50 mt-3">Instagram</span>
               <span class="font-semibold">@kejarmimpi.id</span>
             </a>
-            <a href="https://www.cimbniaga.co.id/id/kejar-mimpi" target="_blank" rel="noopener noreferrer" class="contact-card">
+            <a href="https://www.cimbniaga.co.id/id/kejar-mimpi" target="_blank" rel="noopener noreferrer" class="contact-card reveal">
               <svg class="w-6 h-6 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9" /></svg>
               <span class="text-xs text-white/50 mt-3">Website</span>
               <span class="font-semibold">Program Kejar Mimpi CIMB Niaga</span>
@@ -216,9 +235,9 @@
 
   <div id="footer-slot"></div>
 
-  <script src="/js/config.js?v=20261002-2"></script>
-  <script src="/js/api.js?v=20261002-2"></script>
-  <script src="/js/components.js?v=20261002-2"></script>
-  <script src="/js/pages/about.js?v=20261002-2"></script>
+  <script src="/js/config.js?v=20261002-4"></script>
+  <script src="/js/api.js?v=20261002-4"></script>
+  <script src="/js/components.js?v=20261002-4"></script>
+  <script src="/js/pages/about.js?v=20261002-4"></script>
 </body>
 </html>

@@ -24,38 +24,42 @@ function renderCustomFieldInput(field) {
     ? `<p id="desc-${field.id}" class="text-xs text-gray-500 -mt-0.5 mb-2 whitespace-pre-line leading-relaxed">${escapeHtmlField(field.description)}</p>`
     : "";
   const star = field.is_required ? ` <span class="text-[#C8102E]" aria-hidden="true">*</span>` : "";
-  const label = `<label class="block text-sm font-medium text-gray-700 mb-1">${escapeHtmlField(field.label)}${star}</label>${descHtml}`;
-  const baseInputClass = "w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C8102E]/40 focus:border-[#C8102E]";
+  const inputId = `cf-${field.id}`;
+  const descAttr = descHtml ? ` aria-describedby="desc-${field.id}"` : "";
+  const label = `<label for="${inputId}" class="block text-sm font-semibold text-gray-700 mb-1">${escapeHtmlField(field.label)}${star}</label>${descHtml}`;
+  const groupLabel = `<p class="block text-sm font-semibold text-gray-700 mb-1">${escapeHtmlField(field.label)}${star}</p>${descHtml}`;
+  const baseInputClass = "participant-input";
+  const opt = (o) => escapeHtmlField(o);
 
   if (field.field_type === "textarea") {
-    return `<div>${label}<textarea data-custom-field="${field.id}" ${req} rows="3" class="${baseInputClass}"></textarea></div>`;
+    return `<div>${label}<textarea id="${inputId}" data-custom-field="${field.id}" ${req}${descAttr} rows="3" class="${baseInputClass}"></textarea></div>`;
   }
   if (field.field_type === "dropdown") {
-    const options = (field.options || []).map((o) => `<option value="${o}">${o}</option>`).join("");
-    return `<div>${label}<select data-custom-field="${field.id}" ${req} class="${baseInputClass}"><option value="">-- Pilih --</option>${options}</select></div>`;
+    const options = (field.options || []).map((o) => `<option value="${opt(o)}">${opt(o)}</option>`).join("");
+    return `<div>${label}<select id="${inputId}" data-custom-field="${field.id}" ${req}${descAttr} class="${baseInputClass}"><option value="">-- Pilih --</option>${options}</select></div>`;
   }
   if (field.field_type === "radio") {
     const options = (field.options || [])
       .map(
-        (o, i) => `<label class="flex items-center gap-2 text-sm text-gray-700">
-        <input type="radio" name="custom-radio-${field.id}" data-custom-field="${field.id}" value="${o}" ${req} class="text-[#C8102E] focus:ring-[#C8102E]" /> ${o}
+        (o) => `<label class="choice-option">
+        <input type="radio" name="custom-radio-${field.id}" data-custom-field="${field.id}" value="${opt(o)}" ${req} class="text-[#C8102E] focus:ring-[#C8102E]" /> ${opt(o)}
       </label>`
       )
       .join("");
-    return `<div>${label}<div class="space-y-1.5">${options}</div></div>`;
+    return `<div role="radiogroup">${groupLabel}<div class="grid gap-2">${options}</div></div>`;
   }
   if (field.field_type === "checkbox") {
     const options = (field.options || [])
       .map(
-        (o) => `<label class="flex items-center gap-2 text-sm text-gray-700">
-        <input type="checkbox" data-custom-field="${field.id}" value="${o}" class="text-[#C8102E] rounded focus:ring-[#C8102E]" /> ${o}
+        (o) => `<label class="choice-option">
+        <input type="checkbox" data-custom-field="${field.id}" value="${opt(o)}" class="text-[#C8102E] rounded focus:ring-[#C8102E]" /> ${opt(o)}
       </label>`
       )
       .join("");
-    return `<div>${label}<div class="space-y-1.5">${options}</div></div>`;
+    return `<div role="group">${groupLabel}<div class="grid gap-2">${options}</div></div>`;
   }
   const inputType = field.field_type === "number" ? "number" : field.field_type === "email" ? "email" : field.field_type === "phone" ? "tel" : "text";
-  return `<div>${label}<input type="${inputType}" data-custom-field="${field.id}" ${req} class="${baseInputClass}" /></div>`;
+  return `<div>${label}<input id="${inputId}" type="${inputType}" data-custom-field="${field.id}" ${req}${descAttr} class="${baseInputClass}" /></div>`;
 }
 
 function renderCustomFields(fields) {

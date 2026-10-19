@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="icon" type="image/jpeg" href="/images/logo-kejar-mimpi.jpg" />
-  <link rel="stylesheet" href="/css/styles.css?v=20261002-2" />
+  <link rel="stylesheet" href="/css/styles.css?v=20261002-4" />
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
 
@@ -18,41 +18,70 @@
     <div class="spinner"></div>
   </div>
 
-  <main id="content" class="hidden flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
-    <a href="/index.html" class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#C8102E] mb-6">
-      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-      Kembali ke daftar event
-    </a>
+  <div id="content" class="hidden flex-1 w-full">
+    <!-- Header merah -->
+    <section class="detail-hero text-white">
+      <span class="float-blob w-56 h-56 bg-white/10 -top-20 -right-10" aria-hidden="true"></span>
+      <span class="float-blob w-32 h-32 bg-amber-300/15 bottom-0 left-1/4" style="animation-delay:-3s" aria-hidden="true"></span>
+      <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-28 md:pb-32">
+        <a href="/index.html" class="inline-flex items-center gap-1.5 text-sm font-semibold text-white/90 bg-white/10 hover:bg-white/20 px-3.5 py-2 rounded-full mb-6 transition-colors">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+          Kembali ke daftar event
+        </a>
+        <div class="max-w-3xl">
+          <span id="event-category-badge" class="hidden text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block"></span>
+          <h1 id="event-title" class="text-3xl md:text-4xl font-extrabold leading-tight reveal"></h1>
+        </div>
+      </div>
+      <div class="wave-divider" aria-hidden="true">
+        <svg viewBox="0 0 1440 48" preserveAspectRatio="none"><path fill="#f9fafb" d="M0,24 C320,56 640,0 960,20 C1180,34 1320,44 1440,30 L1440,48 L0,48 Z" /></svg>
+      </div>
+    </section>
 
+  <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24 pb-8 w-full">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <!-- Kolom kiri: info event -->
-      <div class="lg:col-span-2">
-        <div id="event-image" class="w-full h-64 md:h-80 rounded-2xl overflow-hidden bg-gray-100 mb-6"></div>
+      <div class="lg:col-span-2 space-y-6">
+        <div id="event-image" class="w-full h-64 md:h-96 rounded-3xl overflow-hidden bg-gray-100 shadow-xl shadow-red-900/10 ring-4 ring-white reveal"></div>
 
-        <span id="event-category-badge" class="hidden text-xs font-semibold px-3 py-1 rounded-full mb-3 inline-block"></span>
-        <h1 id="event-title" class="text-2xl md:text-3xl font-extrabold text-gray-800 mb-4"></h1>
-
-        <div class="flex flex-wrap gap-4 mb-6 text-sm text-gray-600">
-          <div class="flex items-center gap-2">
-            <svg class="w-5 h-5 text-[#C8102E]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-            <span id="event-date"></span>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div class="info-tile reveal">
+            <span class="info-tile-icon">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+            </span>
+            <div class="min-w-0">
+              <p class="text-xs text-gray-400">Waktu</p>
+              <p id="event-date" class="text-sm font-semibold text-gray-800"></p>
+            </div>
           </div>
-          <div id="event-location-wrap" class="flex items-center gap-2">
-            <svg class="w-5 h-5 text-[#C8102E]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-            <span id="event-location"></span>
+          <div id="event-location-wrap" class="info-tile reveal" style="--reveal-delay:80ms">
+            <span class="info-tile-icon">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            </span>
+            <div class="min-w-0">
+              <p class="text-xs text-gray-400">Lokasi</p>
+              <p id="event-location" class="text-sm font-semibold text-gray-800 break-words"></p>
+            </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl border border-gray-100 p-6">
-          <h2 class="font-bold text-gray-800 mb-3">Tentang Event Ini</h2>
+        <div class="bg-white rounded-3xl border border-gray-100 p-6 md:p-8 shadow-sm reveal">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="w-1.5 h-6 rounded-full bg-gradient-to-b from-[#C8102E] to-[#f87171]" aria-hidden="true"></span>
+            <h2 class="font-extrabold text-gray-800 text-lg">Tentang Event Ini</h2>
+          </div>
           <p id="event-description" class="text-gray-600 whitespace-pre-line leading-relaxed"></p>
         </div>
       </div>
 
       <!-- Kolom kanan: form pendaftaran -->
       <div class="lg:col-span-1">
-        <div class="bg-white rounded-2xl border border-gray-100 p-6 sticky top-24">
-          <div id="quota-info" class="mb-4 text-sm font-medium"></div>
+        <div class="register-card lg:sticky lg:top-24 reveal" style="--reveal-delay:120ms">
+          <div class="register-card-head">
+            <p class="relative text-xs font-bold uppercase tracking-widest text-white/75">Pendaftaran</p>
+            <div id="quota-info" class="relative mt-1 text-sm font-semibold quota-info-light"></div>
+          </div>
+          <div class="p-6">
 
           <div id="register-closed" class="hidden text-center py-6">
             <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -66,23 +95,25 @@
           </div>
 
           <form id="register-form" class="space-y-4">
-            <h3 class="font-bold text-gray-800 mb-2">Daftar Sekarang</h3>
+            <h3 class="font-extrabold text-gray-800 text-lg mb-1">Daftar Sekarang</h3>
 
             <div id="custom-fields-wrap" class="space-y-4"></div>
 
             <p id="no-fields-note" class="hidden text-sm text-gray-500 text-center py-2">Form pendaftaran event ini belum disiapkan.</p>
 
             <button type="submit" id="submit-btn"
-              class="w-full bg-[#C8102E] hover:bg-[#a10d25] text-white font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+              class="btn-primary-glow w-full text-white font-bold py-3.5 rounded-2xl flex items-center justify-center gap-2">
               <span id="submit-btn-text">Daftar Event</span>
               <div id="submit-spinner" class="hidden spinner !w-4 !h-4 !border-2 !border-white !border-t-transparent"></div>
             </button>
             <p id="register-footer-note" class="text-xs text-gray-400 text-center">Kamu akan mendapatkan QR code sebagai tiket masuk di hari-H.</p>
           </form>
+          </div>
         </div>
       </div>
     </div>
   </main>
+  </div>
 
   <div id="not-found" class="hidden flex-1 flex flex-col items-center justify-center py-32 text-center">
     <p class="text-gray-500 font-medium">Event tidak ditemukan</p>
@@ -91,9 +122,9 @@
 
   <div id="footer-slot"></div>
 
-  <script src="/js/config.js?v=20261002-2"></script>
-  <script src="/js/api.js?v=20261002-2"></script>
-  <script src="/js/components.js?v=20261002-2"></script>
-  <script src="/js/pages/event-detail.js?v=20261002-2"></script>
+  <script src="/js/config.js?v=20261002-4"></script>
+  <script src="/js/api.js?v=20261002-4"></script>
+  <script src="/js/components.js?v=20261002-4"></script>
+  <script src="/js/pages/event-detail.js?v=20261002-4"></script>
 </body>
 </html>

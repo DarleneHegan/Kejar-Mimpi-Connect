@@ -22,14 +22,19 @@ function photoHtml(org, textSize) {
   return `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#C8102E] to-[#6e0819] text-white font-bold ${textSize}">${escapeHtml(initials(org.name))}</div>`;
 }
 
-function renderOrganizerCard(org) {
+function renderOrganizerCard(org, index) {
   return `
-  <div class="organizer-card flex flex-col items-center text-center">
-    <div class="organizer-photo w-32 h-32 sm:w-36 sm:h-36 rounded-full overflow-hidden bg-gray-200 shadow-md mb-4">${photoHtml(org, "text-3xl")}</div>
+  <div class="organizer-card flex flex-col items-center text-center reveal" style="--reveal-delay:${(index % 4) * 70}ms">
+    <div class="organizer-photo-ring mb-4">
+      <div class="organizer-photo w-32 h-32 sm:w-36 sm:h-36 rounded-full overflow-hidden bg-gray-200 ring-4 ring-white">${photoHtml(org, "text-3xl")}</div>
+    </div>
     <p class="font-bold text-gray-800 leading-tight">${escapeHtml(org.name)}</p>
-    <p class="text-sm text-gray-600">${escapeHtml(org.role)}</p>
-    ${org.affiliation ? `<p class="text-xs text-gray-500">${escapeHtml(org.affiliation)}</p>` : ""}
-    <button type="button" data-profile="${org.id}" class="mt-3 text-sm font-semibold text-blue-600 hover:underline">View profile</button>
+    <p class="text-sm font-semibold text-[#C8102E] mt-0.5">${escapeHtml(org.role)}</p>
+    ${org.affiliation ? `<p class="text-xs text-gray-500 mt-0.5">${escapeHtml(org.affiliation)}</p>` : ""}
+    <button type="button" data-profile="${org.id}" class="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700 hover:gap-2 transition-all">
+      View profile
+      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" /></svg>
+    </button>
   </div>`;
 }
 
@@ -67,6 +72,7 @@ async function loadOrganizers() {
   }
   const grid = document.getElementById("organizers-grid");
   grid.innerHTML = organizers.map(renderOrganizerCard).join("");
+  observeReveal(grid);
   grid.querySelectorAll("[data-profile]").forEach((btn) => btn.addEventListener("click", () => openProfile(btn.dataset.profile)));
 }
 
