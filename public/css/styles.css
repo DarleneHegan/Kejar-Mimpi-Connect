@@ -426,39 +426,53 @@ a.contact-tile:hover { border-color: var(--cimb-red); }
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  background: #8a0b20;
+  /* Latar merah CIMB penuh dengan cahaya lembut di sisi foto */
+  background:
+    radial-gradient(560px circle at 78% 38%, rgba(255, 255, 255, 0.18), transparent 65%),
+    linear-gradient(120deg, #C8102E 0%, #b30f2b 45%, #8a0b20 100%);
 }
+/* Foto berada di sisi kanan dan tetap jernih (tanpa lapisan warna di atasnya).
+   Sisi kirinya memudar lewat mask sehingga menyatu mulus dengan latar merah. */
 .hero-photo-img {
   position: absolute;
-  inset: 0;
-  width: 100%;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 68%;
   height: 100%;
   object-fit: cover;
-  object-position: 65% 55%;
+  object-position: 55% 28%;
   z-index: -2;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 14%, rgba(0, 0, 0, 0.55) 36%, #000 56%);
+  mask-image: linear-gradient(90deg, transparent 0%, transparent 14%, rgba(0, 0, 0, 0.55) 36%, #000 56%);
 }
-/* Merah pekat di kiri (area teks) lalu memudar ke kanan sehingga foto terlihat */
+/* Bayangan lembut agar teks hero tetap terbaca walau menyentuh tepi foto */
+.hero-photo h1,
+.hero-photo .text-red-100 {
+  text-shadow: 0 2px 16px rgba(110, 8, 25, 0.55);
+}
+/* Hanya bayangan tipis: bawah (menuju kartu statistik) dan tepi kanan (tirai gelap pada foto) */
 .hero-photo-overlay {
   position: absolute;
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(90deg,
-      rgba(200, 16, 46, 0.97) 0%,
-      rgba(200, 16, 46, 0.92) 30%,
-      rgba(184, 14, 42, 0.6) 55%,
-      rgba(138, 11, 32, 0.18) 80%,
-      rgba(138, 11, 32, 0.05) 100%),
-    linear-gradient(0deg, rgba(110, 8, 25, 0.45) 0%, rgba(110, 8, 25, 0) 40%);
+    linear-gradient(0deg, rgba(110, 8, 25, 0.55) 0%, rgba(110, 8, 25, 0) 38%),
+    linear-gradient(270deg, rgba(110, 8, 25, 0.4) 0%, rgba(110, 8, 25, 0) 22%);
 }
-/* Layar kecil: teks memenuhi lebar, jadi overlay dibuat lebih rata agar tetap terbaca */
+/* Layar kecil: teks memenuhi lebar, jadi foto dipindah ke bagian bawah dan memudar ke atas */
 @media (max-width: 767px) {
-  .hero-photo-img { object-position: 70% 50%; }
+  .hero-photo-img {
+    top: auto;
+    left: 0;
+    width: 100%;
+    height: 15rem;
+    object-position: 62% 22%;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.55) 22%, #000 50%);
+    mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.55) 22%, #000 50%);
+  }
   .hero-photo-overlay {
-    background: linear-gradient(180deg,
-      rgba(200, 16, 46, 0.94) 0%,
-      rgba(184, 14, 42, 0.86) 60%,
-      rgba(138, 11, 32, 0.78) 100%);
+    background: linear-gradient(0deg, rgba(110, 8, 25, 0.5) 0%, rgba(110, 8, 25, 0) 40%);
   }
 }
 
