@@ -115,10 +115,10 @@ Backend akan berjalan di `http://127.0.0.1:8000`. Cek `http://127.0.0.1:8000/doc
 Frontend adalah file static biasa. Buka folder `public/` dengan live server, contoh pakai Python:
 
 ```powershell
-python -m http.server 3000 --directory public
+python -m http.server 3456 --directory public
 ```
 
-Lalu buka `http://localhost:3000` di browser. File `public/js/config.js` otomatis mengarahkan API call ke `http://127.0.0.1:8000` saat diakses dari localhost.
+Lalu buka `http://localhost:3456` di browser. File `public/js/config.js` otomatis mengarahkan API call ke `http://127.0.0.1:8000` saat diakses dari localhost.
 
 ---
 

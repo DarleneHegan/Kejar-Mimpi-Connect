@@ -4,9 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kejar Mimpi Jakarta - Event</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/fonts.css" />
+  <link rel="stylesheet" href="/css/tailwind.css" />
   <link rel="icon" type="image/jpeg" href="/images/logo-kejar-mimpi.jpg" />
   <link rel="stylesheet" href="/css/styles.css?v=20261002-7" />
 </head>
@@ -16,7 +15,10 @@
 
   <!-- Hero Section -->
   <section class="hero-photo text-white">
-    <img src="/images/kejar-mimpi-background.jpeg" alt="" aria-hidden="true" class="hero-photo-img" fetchpriority="high" />
+    <picture>
+      <source srcset="/images/kejar-mimpi-background.webp" type="image/webp" />
+      <img src="/images/kejar-mimpi-background.jpeg" alt="" aria-hidden="true" class="hero-photo-img" fetchpriority="high" />
+    </picture>
     <div class="hero-photo-overlay" aria-hidden="true"></div>
     <span class="float-blob w-40 h-40 bg-white/10 -top-10 right-1/3" aria-hidden="true"></span>
     <span class="float-blob w-24 h-24 bg-amber-300/20 bottom-24 left-[28%]" style="animation-delay:-2s" aria-hidden="true"></span>
