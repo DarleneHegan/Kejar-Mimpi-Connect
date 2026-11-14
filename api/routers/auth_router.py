@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from api.database import get_db
 from api.models import Admin
 from api.schemas import AdminLoginRequest, AdminLoginResponse
-from api.auth import verify_password, create_access_token
+from api.auth import verify_password, create_access_token, get_current_admin
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -24,3 +24,12 @@ def login(payload: AdminLoginRequest, db: Session = Depends(get_db)):
 
     token = create_access_token({"sub": admin.id, "email": admin.email})
     return AdminLoginResponse(access_token=token, admin_name=admin.name)
+
+
+@router.get("/me")
+def get_me(current_admin: Admin = Depends(get_current_admin)):
+    return {
+        "id": current_admin.id,
+        "name": current_admin.name,
+        "email": current_admin.email,
+    }

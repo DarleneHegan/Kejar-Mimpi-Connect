@@ -37,7 +37,7 @@ async function apiFetch(path, options = {}, withAuth = false) {
   if (withAuth) {
     const token = getAdminToken();
     if (!token) {
-      window.location.href = "/admin-login.html";
+      window.location.replace("/");
       throw new Error("Belum login");
     }
     headers["Authorization"] = `Bearer ${token}`;
@@ -51,7 +51,7 @@ async function apiFetch(path, options = {}, withAuth = false) {
 
   if (response.status === 401 && withAuth) {
     clearAdminSession();
-    window.location.href = "/admin-login.html";
+    window.location.replace("/");
     throw new Error("Sesi login berakhir, silakan login kembali");
   }
 
@@ -72,6 +72,10 @@ async function apiFetch(path, options = {}, withAuth = false) {
 // ---------- Auth ----------
 async function loginAdmin(email, password) {
   return apiFetch("/api/auth/login", { method: "POST", body: { email, password } });
+}
+
+async function verifyAdminSession() {
+  return apiFetch("/api/auth/me", {}, true);
 }
 
 // ---------- Events ----------

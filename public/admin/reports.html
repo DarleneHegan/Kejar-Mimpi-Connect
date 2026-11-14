@@ -8,6 +8,13 @@
   <link rel="stylesheet" href="/css/tailwind.css" />
   <link rel="icon" type="image/jpeg" href="/images/logo-kejar-mimpi.jpg" />
   <link rel="stylesheet" href="/css/styles.css?v=20261002-4" />
+  <script>
+    if (!localStorage.getItem("admin_access_token")) {
+      window.location.replace("/");
+    } else {
+      document.documentElement.style.visibility = "hidden";
+    }
+  </script>
 </head>
 <body class="bg-gray-50 min-h-screen">
 

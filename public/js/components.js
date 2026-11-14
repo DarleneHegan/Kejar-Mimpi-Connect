@@ -9,14 +9,13 @@ function renderPublicNavbar(activePage = "") {
   <nav id="site-nav" class="site-nav border-b border-gray-100 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
-        <a href="/index.html" class="flex items-center gap-2.5 group">
+        <a href="/events.html" class="flex items-center gap-2.5 group">
           <img src="/images/logo-kejar-mimpi.jpg" alt="Kejar Mimpi Jakarta" class="w-9 h-9 rounded-xl object-cover shadow-sm ring-2 ring-red-100 group-hover:ring-[#C8102E]/40 transition" />
           <span class="font-extrabold text-lg text-gray-800 tracking-tight">Kejar <span class="text-[#C8102E]">Mimpi</span> <span class="text-gray-400 font-semibold">Jakarta</span></span>
         </a>
         <div class="hidden md:flex items-center gap-7">
-          ${link("/index.html", "Event", "home")}
+          ${link("/events.html", "Event", "home")}
           ${link("/about.html", "About", "about")}
-          <a href="/admin-login.html" class="nav-cta">Login Admin</a>
         </div>
         <button id="mobile-menu-btn" class="md:hidden p-2 rounded-xl text-gray-600 hover:bg-gray-100" aria-label="Buka menu" aria-expanded="false" aria-controls="mobile-menu">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -25,9 +24,8 @@ function renderPublicNavbar(activePage = "") {
         </button>
       </div>
       <div id="mobile-menu" class="hidden md:hidden pb-4 flex flex-col gap-1">
-        ${mobileLink("/index.html", "Event", "home")}
+        ${mobileLink("/events.html", "Event", "home")}
         ${mobileLink("/about.html", "About", "about")}
-        <a href="/admin-login.html" class="nav-cta text-center mt-2">Login Admin</a>
       </div>
     </div>
   </nav>`;
@@ -48,14 +46,14 @@ function renderFooter() {
         <div>
           <p class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">Jelajahi</p>
           <div class="flex flex-col gap-2 text-sm">
-            <a href="/index.html" class="hover:text-white transition-colors">Semua Event</a>
+            <a href="/events.html" class="hover:text-white transition-colors">Semua Event</a>
             <a href="/about.html" class="hover:text-white transition-colors">Tentang Komunitas</a>
             <a href="/about.html#organizers" class="hover:text-white transition-colors">Tim Organizer</a>
           </div>
         </div>
         <div class="md:text-right">
           <p class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">Ikut Bergerak</p>
-          <a href="/index.html" class="inline-flex items-center gap-2 text-sm font-semibold text-white bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl transition-colors">
+          <a href="/events.html" class="inline-flex items-center gap-2 text-sm font-semibold text-white bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl transition-colors">
             Cari event untukmu
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
           </a>
@@ -210,7 +208,7 @@ function renderAdminSidebar(activePage = "") {
 
 function mountAdminLayout({ activePage = "" } = {}) {
   if (!isAdminLoggedIn()) {
-    window.location.href = "/admin-login.html";
+    window.location.replace("/");
     return;
   }
 
@@ -220,11 +218,22 @@ function mountAdminLayout({ activePage = "" } = {}) {
   const nameLabel = document.getElementById("admin-name-label");
   if (nameLabel) nameLabel.textContent = getAdminName();
 
+  // Verifikasi token ke server sebelum menampilkan halaman admin
+  verifyAdminSession()
+    .then((me) => {
+      if (me?.name && nameLabel) nameLabel.textContent = me.name;
+      document.documentElement.style.visibility = "";
+    })
+    .catch(() => {
+      clearAdminSession();
+      window.location.replace("/");
+    });
+
   const logoutBtn = document.getElementById("logout-btn");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
       clearAdminSession();
-      window.location.href = "/admin-login.html";
+      window.location.replace("/");
     });
   }
 

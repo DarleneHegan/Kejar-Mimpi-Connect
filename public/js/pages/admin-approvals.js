@@ -64,11 +64,13 @@ function registrationsInTab(tab = activeTab) {
 async function loadEventOptionsApproval() {
   const select = document.getElementById("event-select");
   try {
-    allAdminEventsApproval = await fetchEventsAdmin();
-    allAdminEventsApproval.sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
+    const events = await fetchEventsAdmin();
+    allAdminEventsApproval = events
+      .filter((e) => Boolean(e.requires_approval))
+      .sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
 
     if (allAdminEventsApproval.length === 0) {
-      select.innerHTML = `<option value="">Belum ada event</option>`;
+      select.innerHTML = `<option value="">Belum ada event yang memerlukan approval</option>`;
       return;
     }
 
@@ -78,7 +80,7 @@ async function loadEventOptionsApproval() {
         .map(
           (e) =>
             `<option value="${e.id}">${escapeHtml(e.title)} (${formatDateOnly(e.start_time)})${
-              e.requires_approval ? (e.pending_count ? ` • ${e.pending_count} menunggu` : "") : " - tanpa approval"
+              e.pending_count ? ` • ${e.pending_count} menunggu` : ""
             }</option>`
         )
         .join("");
